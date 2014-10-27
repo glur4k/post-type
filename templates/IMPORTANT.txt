@@ -1,0 +1,6 @@
+﻿Alle Templates in diesem Ordner müssen in das Root-Verzeichnis des aktiven Themes kopiert werden!
+
+Ersetze im theme in der /includes/wordpress-reset-functions in der Funktion get_title_outside_loop (ca Zeile 200) im else-Fall von is_archive das echo durch:
+
+
+echo wp_title('', false);

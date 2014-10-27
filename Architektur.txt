@@ -1,0 +1,9 @@
+Die Spieler sind ein Custom Post Type (rp_spieler) und haben zugeteilte Taxonomies (als Mannschaft für den Spieler).
+Dabei gibt es z.b. das Taxonomy "Herren" oder "Herren II" und eine Taxonomy "Alle Spieler", die jedem Spieler initial angezeigt wird! In dieser Taxonomy werden alle Spieler aufgelistet.
+
+
+
+
+
+
+die Bilanzen als post meta, damit im template danach sortiert werden kann!!
