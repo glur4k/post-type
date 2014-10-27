@@ -1,0 +1,18 @@
+.sortierung-indikator {
+  display: inline-block;
+  margin-left: 5px;
+  margin-bottom: 2px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.sortierung-indikator.up {
+  border-width: 0 5px 5px 5px;
+  border-color: transparent transparent #007BC4 transparent;
+}
+
+.sortierung-indikator.down {
+  border-width: 5px 5px 0 5px;
+  border-color: #007BC4 transparent transparent transparent;
+}

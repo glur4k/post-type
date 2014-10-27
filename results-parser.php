@@ -165,4 +165,35 @@ function rp_clean_taxonomy_title($title) {
   return $title;
 }
 
+/*
+ * Pruefe ob das Plugin ImagesCategories installiert ist
+ * Wenn nicht: zeige message im Admin Bereich
+ */
+add_action('all_admin_notices', 'rp_eigene_admin_nachrichten');
+function rp_eigene_admin_nachrichten() {
+  if (get_query_var('post_type') === 'rp_spieler') {
+    if (!function_exists('z_taxonomy_image_url')) { ?>
+      <div class="error">
+        <p>
+          Das Plugin <a href="https://wordpress.org/plugins/categories-images/">Categories Images</a> ist nicht installiert! Bitte installiere es um Bilder für einzelne Mannschaften zu aktivieren
+        </p>
+      </div>
+    <?php }
+  }
+}
+
+/*
+ * Lade das CSS fuer alle Seiten die was mit dem Custom Post Type zu tun haben
+ */
+add_action('wp_enqueue_scripts', 'rp_lade_css_spieler_etc');
+function rp_lade_css_spieler_etc() {
+  // If it's not the front page, stop executing code, ie. return
+  if (get_post_type() !== 'rp_spieler') {
+    return;
+  }
+
+
+  wp_enqueue_style('rp-spieler-stylesheet', plugins_url('css/rp_spieler.css', __FILE__));
+}
+
 ?>
