@@ -243,8 +243,8 @@ register_deactivation_hook( __FILE__, 'rp_deaktivierungs_hooks' );
 function rp_deaktivierungs_hooks() {
   // Loesche die Seiten "Spieler" und "Alle-Spieler"
   // -----------------------------------------------
-  $spielerSeiteId = get_option('rp_results_parser_einstellungen')['spielerSeiteId'];
-  $alleSpielerSeiteId = get_option('rp_results_parser_einstellungen')['alleSpielerSeiteId'];
+  $spielerSeiteId = get_option('rp_results_parser_einstellungen_data')['spielerSeiteId'];
+  $alleSpielerSeiteId = get_option('rp_results_parser_einstellungen_data')['alleSpielerSeiteId'];
   wp_delete_post($spielerSeiteId, true);
   wp_delete_post($alleSpielerSeiteId, true);
 
@@ -338,7 +338,6 @@ function rp_eigene_admin_nachrichten() {
 add_action('admin_enqueue_scripts', 'rp_lade_css_spieler_etc');
 add_action('wp_enqueue_scripts', 'rp_lade_css_spieler_etc');
 function rp_lade_css_spieler_etc() {
-  // If it's not the front page, stop executing code, ie. return
   if (get_post_type() !== 'rp_spieler') {
     return;
   }
