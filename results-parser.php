@@ -7,6 +7,9 @@ Author: Sandro Tonon
 License: GPLv2
 */
 
+// Init Includes
+require_once('rp-init.php');
+
 /*
  * Registriere den Post-Type
  */
@@ -97,6 +100,7 @@ function rp_registriere_post_type_spieler() {
  * Erstelle Einstellungen-Feld rp_results_parser_einstellungen
  * Erstelle die Seiten "Spieler" und "Alle-Spieler"
  * Erstelle Tabellen rp_spieler_daten und rp_mannschaften_daten
+ * Erstelle Taxonomy-Term "Alle Spieler" - TODO
  */
 register_activation_hook(__FILE__, 'rp_aktivierungs_hooks');
 function rp_aktivierungs_hooks() {
@@ -130,7 +134,7 @@ function rp_aktivierungs_hooks() {
     'spielerSeiteId' => $spielerSeiteId,
     'alleSpielerSeiteId' => $alleSpielerSeiteId
   );
-  update_option('rp_results_parser_einstellungen', $ids);
+  add_option('rp_results_parser_einstellungen_data', $ids);
 
   // Erstelle Tabellen rp_spieler_daten und rp_mannschaften_daten
   // ------------------------------------------------------------
@@ -229,12 +233,11 @@ function rp_aktivierungs_hooks() {
 
 /*
  * Deactivation Hooks:
- * TODO:
- * Loesche die Seiten "Spieler" und "Alle-Spieler" - ok
- * Loesche Tabellen rp_spieler_daten und rp_mannschaften_daten - ok
- * Loesche alle rp_spieler Posts - TODO
+ * Loesche die Seiten "Spieler" und "Alle-Spieler"
+ * Loesche Tabellen rp_spieler_daten und rp_mannschaften_daten
+ * Loesche alle rp_spieler Posts
  * Loesche Taxnomoy rp_spieler_mannschaft und zugehoerige Terms - TODO
- * Loesche Einstellungen bei wp_options rp_results_parser_einstellungen - ok
+ * Loesche Einstellungen bei wp_options rp_results_parser_einstellungen
  */
 register_deactivation_hook( __FILE__, 'rp_deaktivierungs_hooks' );
 function rp_deaktivierungs_hooks() {
@@ -245,6 +248,7 @@ function rp_deaktivierungs_hooks() {
   wp_delete_post($spielerSeiteId, true);
   wp_delete_post($alleSpielerSeiteId, true);
 
+
   // Loesche Tabellen rp_spieler_daten und rp_mannschaften_daten
   // -----------------------------------------------------------
   global $wpdb;
@@ -254,9 +258,17 @@ function rp_deaktivierungs_hooks() {
   $table = $wpdb->prefix . "rp_mannschaften_daten";
   $wpdb->query("DROP TABLE IF EXISTS $table");
 
+
+  // Loesche alle rp_spieler Posts
+  // -----------------------------
+  $posts_table = $wpdb->posts;
+  $query = "DELETE FROM {$posts_table} WHERE post_type = 'rp_spieler'";
+  $wpdb->query($query);
+
+
   // Loesche Einstellungen bei wp_options rp_results_parser_einstellungen
   // --------------------------------------------------------------------
-  delete_option('rp_results_parser_einstellungen');
+  delete_option('rp_results_parser_einstellungen_data');
 }
 
 /*
@@ -330,7 +342,6 @@ function rp_lade_css_spieler_etc() {
   if (get_post_type() !== 'rp_spieler') {
     return;
   }
-
 
   wp_enqueue_style('rp-spieler-stylesheet', plugins_url('css/rp_spieler.css', __FILE__));
 }
