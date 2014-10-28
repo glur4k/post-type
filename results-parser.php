@@ -93,14 +93,19 @@ function rp_registriere_post_type_spieler() {
 }
 
 /*
- * Erstelle die Seiten "Spieler" und "Alle-Spieler" beim Aktivieren des Plugins
+ * Activation Hooks:
+ * Erstelle Einstellungen-Feld rp_results_parser_einstellungen
+ * Erstelle die Seiten "Spieler" und "Alle-Spieler"
+ * Erstelle Tabellen rp_spieler_daten und rp_mannschaften_daten
  */
-register_activation_hook( __FILE__, 'myplugin_activate' );
-function myplugin_activate() {
-  /*
-   * TODO:
-   * Seite "Spieler" und "Alle-Spieler" erstellen
-   */
+register_activation_hook(__FILE__, 'rp_aktivierungs_hooks');
+function rp_aktivierungs_hooks() {
+  // Erstelle Einstellungen-Feld rp_results_parser_einstellungen
+  // -----------------------------------------------------------
+  update_option('rp_results_parser_einstellungen', 'none');
+
+  // Erstelle die Seiten "Spieler" und "Alle-Spieler"
+  // ------------------------------------------------
   $spielerSeiteObj = array(
     'post_title'    => 'Spieler',
     'post_content'  => '',
@@ -119,6 +124,139 @@ function myplugin_activate() {
     'post_parent' => $spielerSeiteId
   );
   $alleSpielerSeiteId = wp_insert_post($alleSpielerSeiteObj);
+
+  // Speichere IDs in den Optionen, damit die Seiten wieder geloescht werden koennen
+  $ids = array(
+    'spielerSeiteId' => $spielerSeiteId,
+    'alleSpielerSeiteId' => $alleSpielerSeiteId
+  );
+  update_option('rp_results_parser_einstellungen', $ids);
+
+  // Erstelle Tabellen rp_spieler_daten und rp_mannschaften_daten
+  // ------------------------------------------------------------
+  global $wpdb;
+  require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+  $charset_collate = '';
+
+  if (!empty($wpdb->charset)) {
+    $charset_collate = "DEFAULT CHARACTER SET {$wpdb->charset}";
+  }
+
+  if (!empty($wpdb->collate)) {
+    $charset_collate .= " COLLATE {$wpdb->collate}";
+  }
+
+  // Erstelle Tabellen fuer die geparsten Daten
+  // Eine Tabelle fuer eine Mannschaft mit folgenden Daten:
+  // tinytext name              Name der Mannschaft
+  // text link                  Link zur Click-TT Seite
+  // int gegner                 Anzahl der Gegner in der gleichen Liga
+  // int position               Die aktuelle Position in der Liga
+  // text liga                Liga, in der die Mannschaft spielt
+  // text data_tabelle    enthaelt die Tabelle der Mannschaft in der Spielklasse
+  // text data_ergebnisse enthaelt die Tabelle mit den bisherigen Ergebnissen der Mannschaft
+  $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
+  $sql = "CREATE TABLE $table_name (
+    id mediumint(9) NOT NULL,
+    name tinytext NOT NULL,
+    link text,
+    gegner mediumint,
+    position mediumint,
+    liga text,
+    data_tabelle text,
+    data_ergebnisse text,
+    UNIQUE KEY id (id)
+  ) $charset_collate;";
+
+  dbDelta($sql);
+
+  // und Tabelle fuer einen Spieler mit den folgenden Daten:
+  // int click_tt_id       die Click-TT-ID des Spielers
+  // int post_id          die ID des Posts, der erstellt wird beim Import
+  // text vorname         Vorname des Spielers
+  // text nachname        Nachname des Spielers
+  // text mannschaft      der Name der Mannschaft in der der Spieler ist
+  // int bilanzwert
+  // int gesamt
+  // int 1                die bilanz gegen den jeweils ersten der gegnerischen Mannschaft
+  // int 2
+  // int 3
+  // int 4
+  // int 5
+  // int 6
+  // int 1+2
+  // int 3+4
+  // int 5+6
+  // int einzel
+  // text einsaetze
+  // int position
+  // double rang
+  // text link
+  // text data_einzel     die geparsten Daten (Bilanzen Einzel)
+  // text data_doppel     die geparsten Daten (Bilanzen Doppel)
+  $table_name = $wpdb->prefix . 'rp_spieler_daten';
+  $sql = "CREATE TABLE $table_name (
+    id mediumint(9) NOT NULL,
+    click_tt_id mediumint NOT NULL,
+    post_id mediumint NOT NULL,
+    vorname text NOT NULL,
+    nachname text NOT NULL,
+    mannschaft text NOT NULL,
+    bilanzwert int NOT NULL,
+    gesamt tinytext NOT NULL,
+    `gegner-1` tinytext,
+    `gegner-2` tinytext,
+    `gegner-3` tinytext,
+    `gegner-4` tinytext,
+    `gegner-5` tinytext,
+    `gegner-6` tinytext,
+    `1+2` tinytext,
+    `3+4` tinytext,
+    `5+6` tinytext,
+    einzel text NOT NULL,
+    einsaetze text NOT NULL,
+    position mediumint NOT NULL,
+    rang float NOT NULL,
+    link text,
+    data_einzel text,
+    data_doppel text,
+    UNIQUE KEY id (id)
+  ) $charset_collate;";
+
+  dbDelta($sql);
+}
+
+/*
+ * Deactivation Hooks:
+ * TODO:
+ * Loesche die Seiten "Spieler" und "Alle-Spieler" - ok
+ * Loesche Tabellen rp_spieler_daten und rp_mannschaften_daten - ok
+ * Loesche alle rp_spieler Posts - TODO
+ * Loesche Taxnomoy rp_spieler_mannschaft und zugehoerige Terms - TODO
+ * Loesche Einstellungen bei wp_options rp_results_parser_einstellungen - ok
+ */
+register_deactivation_hook( __FILE__, 'rp_deaktivierungs_hooks' );
+function rp_deaktivierungs_hooks() {
+  // Loesche die Seiten "Spieler" und "Alle-Spieler"
+  // -----------------------------------------------
+  $spielerSeiteId = get_option('rp_results_parser_einstellungen')['spielerSeiteId'];
+  $alleSpielerSeiteId = get_option('rp_results_parser_einstellungen')['alleSpielerSeiteId'];
+  wp_delete_post($spielerSeiteId, true);
+  wp_delete_post($alleSpielerSeiteId, true);
+
+  // Loesche Tabellen rp_spieler_daten und rp_mannschaften_daten
+  // -----------------------------------------------------------
+  global $wpdb;
+  $table = $wpdb->prefix . "rp_spieler_daten";
+  $wpdb->query("DROP TABLE IF EXISTS $table");
+
+  $table = $wpdb->prefix . "rp_mannschaften_daten";
+  $wpdb->query("DROP TABLE IF EXISTS $table");
+
+  // Loesche Einstellungen bei wp_options rp_results_parser_einstellungen
+  // --------------------------------------------------------------------
+  delete_option('rp_results_parser_einstellungen');
 }
 
 /*
@@ -185,6 +323,7 @@ function rp_eigene_admin_nachrichten() {
 /*
  * Lade das CSS fuer alle Seiten die was mit dem Custom Post Type zu tun haben
  */
+add_action('admin_enqueue_scripts', 'rp_lade_css_spieler_etc');
 add_action('wp_enqueue_scripts', 'rp_lade_css_spieler_etc');
 function rp_lade_css_spieler_etc() {
   // If it's not the front page, stop executing code, ie. return
