@@ -26,10 +26,6 @@
   margin-top: -31px;
 }
 
-.tax-rp_spieler_mannschaft .result-set:last-of-type {
-  margin-bottom: 0;
-}
-
 .tax-rp_spieler_mannschaft .result-set th,
 .tax-rp_spieler_mannschaft .result-set td {
   padding: 5px;

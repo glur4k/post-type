@@ -3,6 +3,10 @@
  * Template fuer die Anzeige einer einzelnen Mannschaft
  */
 
+// TODO:
+// - Position des Spielers vor dem Namen anzeigen
+// - den Link in der Info dynamisch generieren (ID aus Datenbank)
+
 $headerSep = get_template_directory_uri() . "/images/content-header-image-sep.png";
 get_header(); ?>
   <section id="content" class="clearfix page-widh-sidebar">
@@ -121,6 +125,8 @@ get_header(); ?>
           <p><?php _e('Sorry, no posts matched your criteria.'); ?></p>
         <?php endif; ?>
 
+        <div class="dt-message dt-message-notice" style="text-align: center;"><span style="font-size: xx-small;">Die Informationen auf dieser Seite wurden bereitgestellt von Click-TT. Wir übernehmen keine Haftung für die Korrektheit der Daten.</span><br>
+Für weitere Informationen besuchen Sie bitte die Seite von <a href="http://ttvbw.click-tt.de/cgi-bin/WebObjects/nuLigaTTDE.woa/wa/clubTeams?club=1474" target="_blank">Click-TT</a>.</div>
       </div>
     <?php wp_reset_postdata(); ?>
     <?php get_sidebar(); ?>
