@@ -82,17 +82,6 @@ function rp_registriere_post_type_spieler() {
       'parent' => 'Parent Spieler',
     )
   ));
-
-  /*
-   * Erstelle den Standard-Taxonomy-Term "Alle Spieler"
-   * Beim Insert der Spieler, wird dieser automatisch jedem Spieler zugewiesen
-   */
-  wp_insert_term('Alle Spieler', 'rp_spieler_mannschaft',
-    $args = array(
-      'slug' => 'alle-spieler',
-      'description' => 'In dieser Kategorie sind alle Spieler des Veriens'
-    )
-  );
 }
 
 /*
@@ -100,7 +89,8 @@ function rp_registriere_post_type_spieler() {
  * Erstelle Einstellungen-Feld rp_results_parser_einstellungen
  * Erstelle die Seiten "Spieler" und "Alle-Spieler"
  * Erstelle Tabellen rp_spieler_daten und rp_mannschaften_daten
- * Erstelle Taxonomy-Term "Alle Spieler" - TODO
+ * Erstelle Taxonomy-Term "Alle Spieler"
+ * -> Beim Insert der Spieler, wird dieser automatisch jedem Spieler zugewiesen
  */
 register_activation_hook(__FILE__, 'rp_aktivierungs_hooks');
 function rp_aktivierungs_hooks() {
@@ -162,7 +152,7 @@ function rp_aktivierungs_hooks() {
   // text data_ergebnisse enthaelt die Tabelle mit den bisherigen Ergebnissen der Mannschaft
   $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
   $sql = "CREATE TABLE $table_name (
-    id mediumint(9) NOT NULL,
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
     name tinytext NOT NULL,
     link text,
     gegner mediumint,
@@ -201,7 +191,7 @@ function rp_aktivierungs_hooks() {
   // text data_doppel     die geparsten Daten (Bilanzen Doppel)
   $table_name = $wpdb->prefix . 'rp_spieler_daten';
   $sql = "CREATE TABLE $table_name (
-    id mediumint(9) NOT NULL,
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
     click_tt_id mediumint NOT NULL,
     post_id mediumint NOT NULL,
     vorname text NOT NULL,
@@ -229,6 +219,17 @@ function rp_aktivierungs_hooks() {
   ) $charset_collate;";
 
   dbDelta($sql);
+
+  // Erstelle Taxonomy-Term "Alle Spieler"
+  // -> Beim Insert der Spieler, wird dieser automatisch jedem Spieler zugewiesen
+  // ----------------------------------------------------------------------------
+  rp_registriere_post_type_spieler();
+  wp_insert_term('Alle Spieler', 'rp_spieler_mannschaft',
+    $args = array(
+      'slug' => 'alle-spieler',
+      'description' => 'In dieser Kategorie sind alle Spieler des Vereins'
+    )
+  );
 }
 
 /*
@@ -236,7 +237,7 @@ function rp_aktivierungs_hooks() {
  * Loesche die Seiten "Spieler" und "Alle-Spieler"
  * Loesche Tabellen rp_spieler_daten und rp_mannschaften_daten
  * Loesche alle rp_spieler Posts
- * Loesche Taxnomoy rp_spieler_mannschaft und zugehoerige Terms - TODO
+ * Loesche Taxnomoy rp_spieler_mannschaft und zugehoerige Terms
  * Loesche Einstellungen bei wp_options rp_results_parser_einstellungen
  */
 register_deactivation_hook( __FILE__, 'rp_deaktivierungs_hooks' );
@@ -264,6 +265,17 @@ function rp_deaktivierungs_hooks() {
   $posts_table = $wpdb->posts;
   $query = "DELETE FROM {$posts_table} WHERE post_type = 'rp_spieler'";
   $wpdb->query($query);
+
+
+  // Loesche Taxnomoy-Term Relationen, rp_spieler_mannschaft Terms
+  // und rp_spieler_mannschaft Taxonomy- TODO
+  // -------------------------------------------------------------
+  $terms = get_terms('rp_spieler_mannschaft', array('fields' => 'ids', 'hide_empty' => false));
+  foreach ($terms as $value) {
+    wp_delete_term($value, 'rp_spieler_mannschaft');
+  }
+
+  $wpdb->delete($wpdb->term_taxonomy, array('taxonomy' => 'rp_spieler_mannschaft'));
 
 
   // Loesche Einstellungen bei wp_options rp_results_parser_einstellungen
@@ -343,6 +355,29 @@ function rp_lade_css_spieler_etc() {
   }
 
   wp_enqueue_style('rp-spieler-stylesheet', plugins_url('css/rp_spieler.css', __FILE__));
+}
+
+
+// ************ AJAX FUNKTIONALITAET ************ //
+// ********************************************** //
+add_action('wp_ajax_rp_spieler_import', 'rp_parser_process_ajax');
+
+function rp_parser_process_ajax() {
+  // MANNSCHAFTSPARSER MUSS VOR DEM SPIELER PARSER LAUFEN!
+  // Dieser parst allerdings nur die Mannschaftsnamen und keine weiteren Daten
+  try {
+    $mannschaftsParser = new MannschaftsParser();
+  } catch (Exception $e) {
+    echo 'Fehler! ' . $e->getMessage();
+  }
+
+  try {
+    $spieler_parser = new SpielerParser();
+  } catch (Exception $e) {
+    echo 'Fehler! ' . $e->getMessage();
+  }
+
+  die();
 }
 
 ?>

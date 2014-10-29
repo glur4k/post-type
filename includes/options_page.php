@@ -22,7 +22,7 @@ class options_page {
       'manage_options',
       'results_parser-admin',
       array($this, 'rp_einstellungen_layout')
-      );
+    );
     // Lade Scripts.js nur auf der Einstellungs-Seite
     add_action('load-' . $option_page, array($this, 'include_rp_js'));
   }
@@ -167,13 +167,13 @@ class options_page {
 
   public function include_rp_js() {
     if (isset($_POST['importiere_spieler']) && $_POST['importiere_spieler'] === 'true') {
-      wp_enqueue_script('rp_ajax', plugins_url('/js/rp_ajax.js', __FILE__), array('jquery'), '1', true);
+      wp_enqueue_script('rp_ajax', plugins_url('../js/rp_ajax.js', __FILE__), array('jquery'), '1', true);
 
       $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
 
       $params = array(
         'ajaxurl' => admin_url('admin-ajax.php', $protocol)
-        );
+      );
 
       wp_localize_script('rp_ajax', 'rp_ajax', $params);
     }

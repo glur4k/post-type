@@ -19,5 +19,61 @@
 
 .rp_mannschafts_bild {
   width: 100%;
-  margin: 0 -30px;
+  margin: 0 -30px -5px;
+}
+
+.tax-rp_spieler_mannschaft .rp_mannschafts_bild {
+  margin-top: -31px;
+}
+
+.tax-rp_spieler_mannschaft .result-set:last-of-type {
+  margin-bottom: 0;
+}
+
+.tax-rp_spieler_mannschaft .result-set th,
+.tax-rp_spieler_mannschaft .result-set td {
+  padding: 5px;
+}
+
+.tax-rp_spieler_mannschaft .result-set th {
+  font-size: 10pt;
+}
+
+.rp_spieler table {
+  margin-bottom: 15px;
+}
+
+.rp_spieler table td,
+.rp_spieler table th {
+  padding: 10px;
+  font-size: 10pt;
+}
+
+.rp_spieler a.dt-button {
+  margin-bottom: 0;
+}
+
+.rp_spieler .spieler-portrait-wrapper img,
+.rp_spieler .spieler-portrait-wrapper {
+  display: block;
+  height: 140px;
+  width: 140px;
+  border-radius: 50%;
+  margin: 0 auto 5px;
+}
+
+.rp_spieler .spieler-portrait-wrapper img {
+  display: block;
+}
+
+.rp_spieler .spieler-portrait-wrapper.wrapper-no-img {
+  line-height: 140px;
+  color: white !important;
+  font-size: 18pt;
+  background-color: #CCCCCC;
+}
+
+.rp_spieler .spieler-portrait-wrapper.wrapper-no-img:hover,
+.rp_spieler .spieler-portrait-wrapper.wrapper-no-img:focus {
+  text-decoration: none !important;
 }
