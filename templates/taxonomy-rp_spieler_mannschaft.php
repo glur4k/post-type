@@ -1,13 +1,21 @@
 <?php
-
 /*
  * Template fuer die Anzeige einer einzelnen Mannschaft
  */
 
+// TODO: Style-Angaben in Stylesheet übernehmen
+
+$headerSep = get_template_directory_uri() . "/images/content-header-image-sep.png";
 get_header(); ?>
   <section id="content" class="clearfix page-widh-sidebar">
-    <div class="content-header-sep"></div>
+    <div class="content-header-sep" style="background-image: url(<?php echo $headerSep; ?>);"></div>
       <div class="page">
+
+        <?php if (function_exists('z_taxonomy_image_url') && z_taxonomy_image_url() !== false): ?>
+          <div class="rp_mannschafts_bild">
+            <img src="<?php echo z_taxonomy_image_url(); ?>" style="width: 100%; margin-bottom: 30px;">
+          </div>
+        <?php endif ?>
 
         <table>
           <tr>
@@ -43,11 +51,25 @@ get_header(); ?>
 
 
             <h2><?php the_title(); ?></h2>
-            <a href="<?php echo get_permalink(); ?>">Link</a>
+            <p><a href="<?php echo get_permalink(); ?>">Link</a></p>
 
 
           <?php endwhile; ?>
           <!-- end of the loop -->
+
+          <?php // Mannschafts Tabellen ausgeben ?>
+          <hr>
+          <h4>Aktuelle Tabelle</h4>
+
+          <?php
+            /*
+            $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
+            $sql = "SELECT * FROM $table_name
+                    WHERE mannschaft = %s";
+            $meta = $wpdb->get_row($wpdb->prepare($sql, $mannschaft), ARRAY_A);
+            extract($meta);
+            */
+          ?>
 
           <?php wp_reset_postdata(); ?>
         <?php else : ?>

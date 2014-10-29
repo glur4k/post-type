@@ -16,3 +16,8 @@
   border-width: 5px 5px 0 5px;
   border-color: #007BC4 transparent transparent transparent;
 }
+
+.rp_mannschafts_bild {
+  width: 100%;
+  margin: 0 -30px;
+}

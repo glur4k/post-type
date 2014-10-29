@@ -1,7 +1,7 @@
 <?php
-  /*
-  * Template fuer einen einzelnen Spieler
-  */
+/*
+ * Template fuer einen einzelnen Spieler
+ */
 ?>
 
 <?php get_header(); ?>

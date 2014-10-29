@@ -1,15 +1,19 @@
 <?php
+/*
+ * Template fuer die Anzeige aller Spieler
+ */
 
 get_header(); ?>
   <section id="content" class="clearfix page-widh-sidebar">
     <div class="content-header-sep"></div>
       <div class="page">
         <?php
-          // TODO: Bild (Pfeil) nach dem Link einfuegen, zur Darstellung der Sortierung
           // Sortierfunktionalitaet
           $sortierung = get_query_var('sortierung');
           $metaQuery = '';
           $metaKey = '';
+          $sortName = '';
+          $sortBilanz = '';
           $sortierungName = false;
 
           switch ($sortierung) {
@@ -17,6 +21,7 @@ get_header(); ?>
               $sortierungBilanz = 'bilanzAbsteigend';
               $order = 'DESC';
               $orderby = 'title';
+              $sortName = 'down';
               break;
             case 'bilanzAufsteigend':
               $sortierungBilanz = 'bilanzAbsteigend';
@@ -28,6 +33,7 @@ get_header(); ?>
                 ),
               );
               $metaKey = 'bilanz';
+              $sortBilanz = 'up';
               break;
             case 'bilanzAbsteigend':
               $sortierungBilanz = 'bilanzAufsteigend';
@@ -39,19 +45,21 @@ get_header(); ?>
                 )
               );
               $metaKey = 'bilanz';
+              $sortBilanz = 'down';
               break;
             default:
               $sortierungName = 'nameAbsteigend';
               $sortierungBilanz = 'bilanzAbsteigend';
               $order = 'ASC';
               $orderby = 'title';
+              $sortName = 'up';
               break;
           }
 
         ?>
         <h5>Sortieren nach:</h5>
-        <h6 style="float: left;"><a href="<?php echo add_query_arg('sortierung', $sortierungName); ?>">Name<span class="sortierung-indikator"></span></a></h6>
-        <h6 style="float: right;"><a href="<?php echo add_query_arg('sortierung', $sortierungBilanz); ?>">Bilanz<span class="sortierung-indikator"></span></a></h6>
+        <h6 style="float: left;"><a href="<?php echo add_query_arg('sortierung', $sortierungName); ?>">Name<span class="sortierung-indikator <?php echo $sortName ?>"></span></a></h6>
+        <h6 style="float: right;"><a href="<?php echo add_query_arg('sortierung', $sortierungBilanz); ?>">Bilanz<span class="sortierung-indikator <?php echo $sortBilanz ?>"></span></a></h6>
 
         <hr>
 
@@ -73,9 +81,11 @@ get_header(); ?>
           <!-- the loop -->
           <?php while ($the_query->have_posts()) : $the_query->the_post(); ?>
 
-            <h4><?php the_title(); ?></h4>
-            <a href="<?php echo get_permalink(); ?>">Link</a>
-            Bilanz: <?php echo get_post_meta(get_the_ID(), 'bilanz')[0]; ?>
+            <div class="dt-message dt-message-paragraph">
+              <h4><?php the_title(); ?></h4>
+              <a href="<?php echo get_permalink(); ?>">Link</a>
+              Bilanz: <?php echo get_post_meta(get_the_ID(), 'bilanz')[0]; ?>
+            </div>
 
           <?php endwhile; ?>
           <!-- end of the loop -->
