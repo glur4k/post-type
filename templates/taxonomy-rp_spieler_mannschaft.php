@@ -6,6 +6,7 @@
 // TODO:
 // - Position des Spielers vor dem Namen anzeigen
 // - den Link in der Info dynamisch generieren (ID aus Datenbank)
+// - Die letzten Ergebnisse der XXX dynamisch generieren
 
 $headerSep = get_template_directory_uri() . "/images/content-header-image-sep.png";
 get_header(); ?>
