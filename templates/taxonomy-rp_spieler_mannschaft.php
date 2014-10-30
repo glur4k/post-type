@@ -20,18 +20,21 @@ get_header(); ?>
 
         <table>
           <tr>
+            <th>Siege</th>
+            <th>Unentschieden</th>
+            <th>Niederlagen</th>
             <th>Bilanz</th>
-            <th>Statistik</th>
           </tr>
           <tr>
             <td>Bla</td>
+            <td>Blubb</td>
+            <td>Blubb</td>
             <td>Blubb</td>
           </tr>
         </table>
 
         <?php
-          // Zeige die einzelnen Spieler an
-
+          // Erstelle das Spieler-Query
           $args = array(
             'post_type' => 'rp_spieler',
             'meta_key'=> $mannschaft,
@@ -46,22 +49,46 @@ get_header(); ?>
               )
             )
           );
-
           $the_query = new WP_Query($args);
         ?>
+
+        <?php
+          // Hole data_tabelle, data_ergebnisse, link, begegnungen aus mannschaften_daten Tabelle
+          $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
+          $sql = "SELECT data_tabelle, data_ergebnisse, link, begegnungen FROM $table_name
+                  WHERE name = %s";
+          $meta = $wpdb->get_row($wpdb->prepare($sql, ParserUtils::konvertiereMannschaftsNamen($mannschaft)), ARRAY_A);
+          extract($meta);
+        ?>
+
+
+        <h5 class="dt-message dt-message-info">Mannschaftsaufstellung</h5>
 
         <?php if ($the_query->have_posts()) : ?>
           <!-- the loop -->
           <?php $count = 1; $last = false; ?>
           <?php while ($the_query->have_posts()) : $the_query->the_post(); ?>
+            <?php
+              // Duotive-One-Third Logik
+              if ($count === 3) {
+                $last = true;
+                $count = 1;
+              } else {
+                $count++;
+                $last = false;
+              }
+            ?>
 
-            <?php if ($count === 3) {
-              $last = true;
-              $count = 1;
-            } else {
-              $count++;
-              $last = false;
-            }?>
+
+
+            <?php
+              // Hole Daten des Spielers aus rp_spieler_daten
+              $table_name = $wpdb->prefix . 'rp_spieler_daten';
+              $sql = "SELECT einsaetze, bilanzwert FROM $table_name
+                      WHERE post_id = %d";
+              $meta = $wpdb->get_row($wpdb->prepare($sql, get_the_ID()), ARRAY_A);
+              extract($meta);
+            ?>
 
             <?php echo '<div class="dt-onethird' . ($last ? ' dt-onethirdlast' : '') . '">'; ?>
               <div class="rp_spieler">
@@ -78,11 +105,11 @@ get_header(); ?>
                 <table>
                   <tr>
                     <th>Einsätze</th>
-                    <td>X</td>
+                    <td><?php echo $einsaetze ?></td>
                   </tr>
                   <tr>
                     <th>Gesamtbilanz</th>
-                    <td>X</td>
+                    <td><?php echo ParserUtils::signBilanzwert($bilanzwert) ?></td>
                   </tr>
                 </table>
                 <a title="Ausf&uuml;hliche Statistiken zu <?php the_title(); ?>" class="dt-button dt-button-icon dt-button-icon-info" href="<?php echo get_post_permalink(); ?>">Details</a>
@@ -96,14 +123,6 @@ get_header(); ?>
           <?php // Mannschafts Tabellen ausgeben ?>
           <div class="clearfix"></div>
           <div class="dt-separator-top post-spieler clearfix"><a class="scroll" href="#website-header">TOP</a></div>
-          <?php
-            // Hole data_tabelle, data_ergebnisse, Link aus mannschaften_daten Tabelle
-            $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
-            $sql = "SELECT data_tabelle, data_ergebnisse, link FROM $table_name
-                    WHERE name = %s";
-            $meta = $wpdb->get_row($wpdb->prepare($sql, ParserUtils::konvertiereMannschaftsNamen($mannschaft)), ARRAY_A);
-            extract($meta);
-          ?>
           <h5 class="dt-message dt-message-info">Die aktuelle Tabelle</h5>
           <?php echo $data_tabelle ?>
 
