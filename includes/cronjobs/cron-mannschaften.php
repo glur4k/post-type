@@ -39,6 +39,7 @@ class CronMannschaften {
       $mannschaften[$key]['gegner'] = $this->rp_get_mannschaften_gegner($mannschaftsLink);
       $mannschaften[$key]['position'] = $this->rp_get_mannschaften_position($mannschaft['name']);
       $mannschaften[$key]['liga'] = $this->rp_get_mannschaften_liga($mannschaft['name']);
+      $mannschaften[$key]['begegnungen'] = $this->rp_get_mannschaften_begegnungen($mannschaftsLink);
       $mannschaften[$key]['data_tabelle'] = $this->rp_get_mannschaften_data_tabelle($mannschaftsLink);
       $mannschaften[$key]['data_ergebnisse'] = $this->rp_get_mannschaften_data_ergebnisse($mannschaft['name'], $mannschaftsLink);
     }
@@ -94,6 +95,17 @@ class CronMannschaften {
     $liga = $split[1];
 
     return $liga;
+  }
+
+  private function rp_get_mannschaften_begegnungen($link) {
+    $html = file_get_html($link);
+    $table = $html->find('table', 0);
+    $zeilennummer = $this->rp_finde_passende_zeile_mannschaft($table, $this->clubName);
+
+    $row = $table->find('tr', $zeilennummer);
+    $begegnungen = trim($row->find('td', 3)->innertext);
+
+    return $begegnungen;
   }
 
   private function rp_get_mannschaften_data_tabelle($link) {

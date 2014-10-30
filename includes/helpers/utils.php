@@ -88,5 +88,17 @@ class ParserUtils {
     }
     return implode('', $strings);
   }
+
+  /**
+   * Fuegt dem Bilanzwert ein +-Zeichen hinzu, falls > 0
+   * @param int $bilanzwert der Name des Spielers
+   * @return string         das Kuerzel "SP"
+   */
+  public static function signBilanzwert($bilanzwert) {
+    if ($bilanzwert > 0) {
+      return '+' . $bilanzwert;
+    }
+    return $bilanzwert;
+  }
 }
 ?>

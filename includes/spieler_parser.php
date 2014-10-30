@@ -72,7 +72,7 @@ class SpielerParser {
       // um mehrere queries zu verhindern
       global $wpdb;
       $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
-      $query = 'SELECT name, gegner FROM ' . $table_name;
+      $query = 'SELECT name, begegnungen FROM ' . $table_name;
       $alleMannschaften = $wpdb->get_results($query, ARRAY_A);
 
       $tabellen = $html->find('#content', 0)->find('table');
@@ -117,7 +117,7 @@ class SpielerParser {
                   $spieler[$spielerID]['mannschaft'] = $mannschaft['name'];
                   $spieler[$spielerID]['rang'] = $elemente[0]->plaintext;
                   $spieler[$spielerID]['position'] = $index;
-                  $spieler[$spielerID]['einsaetze'] .= ParserUtils::rp_clean_umlaute($elemente[$key]->plaintext) . '/' . ($mannschaft['gegner'] * 2);
+                  $spieler[$spielerID]['einsaetze'] = ParserUtils::rp_clean_umlaute($elemente[$key]->plaintext) . '/' . $mannschaft['begegnungen'];
                 }
               }
             } else {
@@ -201,10 +201,14 @@ class SpielerParser {
 
     if ($exists > 0) {
       // Spieler-Eintrag existiert schon -> update
+      $spieler = ParserUtils::rp_erstelle_valide_spalten_namen($spieler);
       $wpdb->update(
         $table_name,
         $spieler,
-        array('click_tt_id' => $spieler['click_tt_id'], 'mannschaft' => $spieler['mannschaft'])
+        array(
+          'click_tt_id' => $spieler['click_tt_id'],
+          'mannschaft' => $spieler['mannschaft']
+        )
       );
     } else {
       // Spieler-Eintrag existiert noch nicht -> insert
@@ -212,8 +216,7 @@ class SpielerParser {
       $wpdb->insert($table_name, $spieler);
     }
 
-
-    // Fuege den rang dem Post als Meta-Information hinzu damit in der Kategorie-Ansicht die Spieler sortiert werden koennen
+    // Fuege den Rang dem Post als Meta-Information hinzu damit in der Kategorie-Ansicht die Spieler sortiert werden koennen
     update_post_meta($postID, ParserUtils::konvertiereMannschaftsNamen($spieler['mannschaft']), $spieler['rang'], true);
 
     // Taxonomy immer hinzufuegen! Da auch welche hinzukommen koennen

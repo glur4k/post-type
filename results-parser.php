@@ -150,9 +150,10 @@ function rp_aktivierungs_hooks() {
   // text link                  Link zur Click-TT Seite
   // int gegner                 Anzahl der Gegner in der gleichen Liga
   // int position               Die aktuelle Position in der Liga
-  // text liga                Liga, in der die Mannschaft spielt
-  // text data_tabelle    enthaelt die Tabelle der Mannschaft in der Spielklasse
-  // text data_ergebnisse enthaelt die Tabelle mit den bisherigen Ergebnissen der Mannschaft
+  // text liga                  Liga, in der die Mannschaft spielt
+  // int begegnungen            Anzahl der Spiele, die die Mannschaft schon hatte
+  // text data_tabelle          enthaelt die Tabelle der Mannschaft in der Spielklasse
+  // text data_ergebnisse       enthaelt die Tabelle mit den bisherigen Ergebnissen der Mannschaft
   $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
   $sql = "CREATE TABLE $table_name (
     id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -161,6 +162,7 @@ function rp_aktivierungs_hooks() {
     gegner mediumint,
     position mediumint,
     liga text,
+    begegnungen mediumint,
     data_tabelle text,
     data_ergebnisse text,
     UNIQUE KEY id (id)
