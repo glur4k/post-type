@@ -48,6 +48,9 @@ function rp_registriere_post_type_spieler() {
     'show_ui' => true,
     'show_in_menu' => true,
     'capability_type' => 'post',
+    'capabilities' => array(
+      'create_posts' => false, // Removes support for the "Add New" function
+    ),
     'map_meta_cap' => true,
     'hierarchical' => false,
     'rewrite' => array(
@@ -356,6 +359,76 @@ function rp_lade_css_spieler_etc() {
 
   wp_enqueue_style('rp-spieler-stylesheet', plugins_url('css/rp_spieler.css', __FILE__));
 }
+
+
+// ************ MODIFIZIERE ADMIN SEITE ************ //
+// ************************************************* //
+/*
+ * Loesche Spalte "Datum"
+ */
+add_filter('manage_edit-rp_spieler_columns', 'rp_function_post_type_content');
+function rp_function_post_type_content($columns) {
+  global $typenow;
+  if ($typenow == 'rp_spieler') {
+    unset($columns['date']);
+    return $columns;;
+  }
+}
+
+add_filter("manage_edit-rp_spieler_columns", "rp_spieler_edit_columns");
+function rp_spieler_edit_columns($columns) {
+  $columns = array(
+    "cb" => '<input type="checkbox" />',
+    "photo" => __("Image"),
+    "title" => __("Name"),
+    "rp_spieler_mannschaft" => __("Mannschaft")
+  );
+  return $columns;
+}
+
+add_action("manage_rp_spieler_posts_custom_column", "rp_spieler_custom_columns");
+function rp_spieler_custom_columns($column) {
+  wp_enqueue_style('rp-spieler-stylesheet');
+  global $post;
+  switch ($column) {
+    case "photo":
+      if (has_post_thumbnail()) {
+        echo '<a href="' . get_edit_post_link() . '">';
+        the_post_thumbnail(array(50, 50), array('style' => 'border-radius:50%;'));
+        echo '</a>';
+      } else {
+        echo '<a href="' . get_edit_post_link() . '">';
+        echo '<div class="rp_spieler_liste_no_thumbnail">';
+        echo ParserUtils::baueTitelKuerzel(get_the_title());
+        echo '</div>';
+        echo '</a>';
+      }
+      break;
+    case "rp_spieler_mannschaft":
+      echo get_the_term_list($post->ID, 'rp_spieler_mannschaft', '', ', ','');
+    break;
+  }
+}
+
+// Sortiere die Spieler nach Name
+add_filter('pre_get_posts', 'rp_spieler_sortiere_spieler_admin');
+function rp_spieler_sortiere_spieler_admin($wp_query) {
+  if (is_admin() && !isset($_GET['orderby'])) {
+    $post_type = $wp_query->query['post_type'];
+    if (in_array($post_type, array('rp_spieler'))) {
+      $wp_query->set('orderby', 'title');
+      $wp_query->set('order', 'ASC');
+    }
+  }
+}
+
+// Benenne "Beitragsbild" in "Spielerportrait" um
+new Featured_Image_Box_Changer(array(
+  'post_type'     => 'rp_spieler',
+  'metabox_title' => __('Spielerportrait', 'rp_spieler'),
+  'set_text'      => __('Setze das Spielerportrait', 'rp_spieler'),
+  'remove_text'   => __('Spielerportrait entfernen', 'rp_spieler')
+));
 
 
 // ************ AJAX FUNKTIONALITAET ************ //

@@ -212,6 +212,10 @@ class SpielerParser {
       $wpdb->insert($table_name, $spieler);
     }
 
+
+    // Fuege den rang dem Post als Meta-Information hinzu damit in der Kategorie-Ansicht die Spieler sortiert werden koennen
+    update_post_meta($postID, ParserUtils::konvertiereMannschaftsNamen($spieler['mannschaft']), $spieler['rang'], true);
+
     // Taxonomy immer hinzufuegen! Da auch welche hinzukommen koennen
     wp_add_object_terms($postID, $spieler['mannschaft'], 'rp_spieler_mannschaft');
     return true;

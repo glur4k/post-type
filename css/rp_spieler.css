@@ -35,6 +35,10 @@
   font-size: 10pt;
 }
 
+.rp_spieler h6 {
+  padding-bottom: 0;
+}
+
 .rp_spieler table {
   margin-bottom: 15px;
 }
@@ -72,4 +76,30 @@
 .rp_spieler .spieler-portrait-wrapper.wrapper-no-img:hover,
 .rp_spieler .spieler-portrait-wrapper.wrapper-no-img:focus {
   text-decoration: none !important;
+}
+
+/* Admin Seite */
+/* ----------- */
+.type-rp_spieler .photo a {
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  line-height: 50px;
+  color: white;
+  background-color: #CCCCCC;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 12pt;
+}
+
+.column-rp_spieler_mannschaft {
+  width: 17%;
+}
+
+.column-photo {
+  width: 5%;
+}
+
+td.page-title {
+  vertical-align: middle;
 }
