@@ -115,11 +115,15 @@
 /* ----------- */
 
 .column-rp_spieler_mannschaft {
-  width: 17%;
+  width: 200px;
 }
 
 .column-photo {
-  width: 5%;
+  width: 60px;
+  white-space: nowrap;
+}
+.column-photo .spieler-portrait-wrapper {
+  display: block;
 }
 
 td.page-title {
