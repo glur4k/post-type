@@ -53,44 +53,61 @@
   margin-bottom: 0;
 }
 
-.rp_spieler .spieler-portrait-wrapper img,
-.rp_spieler .spieler-portrait-wrapper {
-  display: block;
-  height: 140px;
-  width: 140px;
-  border-radius: 50%;
-  margin: 0 auto 5px;
+.rp_spieler-mannschafts-uebersicht th,
+.rp_spieler-mannschafts-uebersicht td {
+  text-align: center;
 }
 
-.rp_spieler .spieler-portrait-wrapper img {
-  display: block;
+.rp_spieler-mannschafts-uebersicht td {
+  font-weight: bold;
+  font-size: 12pt;
 }
 
-.rp_spieler .spieler-portrait-wrapper.wrapper-no-img {
-  line-height: 140px;
-  color: white !important;
-  font-size: 18pt;
-  background-color: #CCCCCC;
-}
-
-.rp_spieler .spieler-portrait-wrapper.wrapper-no-img:hover,
-.rp_spieler .spieler-portrait-wrapper.wrapper-no-img:focus {
-  text-decoration: none !important;
-}
-
-/* Admin Seite */
-/* ----------- */
-.type-rp_spieler .photo a {
+/* Spieler Bild immer rund und wenn kein Bild vorhanden, zeige Dummy */
+/* ----------------------------------------------------------------- */
+.spieler-portrait-wrapper {
   display: inline-block;
-  height: 50px;
-  width: 50px;
-  line-height: 50px;
-  color: white;
+}
+.spieler-portrait-wrapper img {
+  border-radius: 50%;
+  display: block;
+}
+.spieler-portrait-wrapper.portrait-wrapper-no-img {
+  color: white !important;
   background-color: #CCCCCC;
   border-radius: 50%;
   text-align: center;
   font-size: 12pt;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
 }
+.spieler-portrait-wrapper.portrait-wrapper-no-img:hover,
+.spieler-portrait-wrapper.portrait-wrapper-no-img:hover {
+  text-decoration: none !important;
+}
+
+/* Alle Spieler Seite */
+/* ------------------ */
+.alle-spieler .spieler-uebersicht h4 {
+  display: inline-block;
+}
+
+.alle-spieler .spieler-uebersicht p {
+  display: inline-block;
+  float: right;
+  padding-top: 11px;
+}
+
+.spieler-portrait-wrapper {
+  margin-right: 5px;
+}
+
+/* Single Spieler Seite */
+/* -------------------- */
+
+/* Admin Seite */
+/* ----------- */
 
 .column-rp_spieler_mannschaft {
   width: 17%;

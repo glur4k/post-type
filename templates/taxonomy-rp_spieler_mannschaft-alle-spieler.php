@@ -6,7 +6,7 @@
 get_header(); ?>
   <section id="content" class="clearfix page-widh-sidebar">
     <div class="content-header-sep"></div>
-      <div class="page">
+      <div class="page alle-spieler">
         <?php
           // Sortierfunktionalitaet
           $sortierung = get_query_var('sortierung');
@@ -32,7 +32,7 @@ get_header(); ?>
                   'type' => 'DECIMAL'
                 ),
               );
-              $metaKey = 'bilanz';
+              $metaKey = 'bilanzwert';
               $sortBilanz = 'up';
               break;
             case 'bilanzAbsteigend':
@@ -44,7 +44,7 @@ get_header(); ?>
                   'type' => 'DECIMAL'
                 )
               );
-              $metaKey = 'bilanz';
+              $metaKey = 'bilanzwert';
               $sortBilanz = 'down';
               break;
             default:
@@ -55,16 +55,10 @@ get_header(); ?>
               $sortName = 'up';
               break;
           }
-
         ?>
-        <h5>Sortieren nach:</h5>
-        <h6 style="float: left;"><a href="<?php echo add_query_arg('sortierung', $sortierungName); ?>">Name<span class="sortierung-indikator <?php echo $sortName ?>"></span></a></h6>
-        <h6 style="float: right;"><a href="<?php echo add_query_arg('sortierung', $sortierungBilanz); ?>">Bilanz<span class="sortierung-indikator <?php echo $sortBilanz ?>"></span></a></h6>
-
-        <hr>
 
         <?php
-          // Zeige Spieler an
+          // Erstelle den Spieler Query
           $mannschaft = get_query_var('term');
 
           $args = array(
@@ -78,14 +72,28 @@ get_header(); ?>
           $the_query = new WP_Query($args);
         ?>
 
+        <h5 class="dt-message dt-message-info">Momentan spielen <?php echo $the_query->found_posts ?> Spieler aktiv in unseren Mannschaften:</h5>
+        <h5>Sortieren nach:</h5>
+        <h6 style="float: left;"><a href="<?php echo add_query_arg('sortierung', $sortierungName); ?>">Name<span class="sortierung-indikator <?php echo $sortName ?>"></span></a></h6>
+        <h6 style="float: right;"><a href="<?php echo add_query_arg('sortierung', $sortierungBilanz); ?>">Bilanz<span class="sortierung-indikator <?php echo $sortBilanz ?>"></span></a></h6>
+
+        <hr>
+
         <?php if ($the_query->have_posts()) : ?>
           <!-- the loop -->
           <?php while ($the_query->have_posts()) : $the_query->the_post(); ?>
 
-            <div class="dt-message dt-message-paragraph">
-              <h4><?php the_title(); ?></h4>
-              <a href="<?php echo get_permalink(); ?>">Link</a>
-              Bilanz: <?php echo get_post_meta(get_the_ID(), 'bilanz')[0]; ?>
+            <div class="dt-message dt-message-paragraph spieler-uebersicht">
+              <?php if (($url = wp_get_attachment_image_src(get_post_thumbnail_id(), 'post-thumbnail')) !== false): ?>
+                <a title="Ausf&uuml;hliche Statistiken zu <?php the_title(); ?>" class="spieler-portrait-wrapper" href="<?php echo get_post_permalink(); ?>"><?php the_post_thumbnail(array(60, 60)); ?></a>
+              <?php else: ?>
+                <a title="Ausf&uuml;hliche Statistiken zu <?php the_title(); ?>" class="spieler-portrait-wrapper portrait-wrapper-no-img" href="<?php echo get_post_permalink(); ?>"><?php echo ParserUtils::baueTitelKuerzel(get_the_title()); ?></a>
+              <?php endif; ?>
+              <h4><a title="Details von <?php the_title(); ?> anzeigen" href="<?php echo get_permalink(); ?>"><?php the_title(); ?></a></h4>
+              <p>
+                <a class="dt-more-link" href="<?php echo get_post_permalink(); ?>"><span><span><strong><?php echo ($bilanzwert = get_post_meta(get_the_ID(), 'bilanzwert')[0]) > 0 ?  '+' . $bilanzwert : $bilanzwert; ?></strong> (<?php echo get_post_meta(get_the_ID(), 'mannschaft', true) ?>)</span></span></a>
+              </p>
+
             </div>
 
           <?php endwhile; ?>

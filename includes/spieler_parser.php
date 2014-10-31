@@ -4,8 +4,6 @@ require_once('helpers/utils.php');
 
 /**
 * Parst die Spieler auf Click-TT...
-*
-* TODO: meta-rang als JSON Objekt
 */
 class SpielerParser {
 
@@ -130,6 +128,9 @@ class SpielerParser {
 
           // Saeubere Bilanzwert zu int
           $spieler[$spielerID]['bilanzwert'] = str_replace('+', '', $spieler[$spielerID]['bilanzwert']);
+          if ($spieler[$spielerID]['bilanzwert'] === '') {
+            $spieler[$spielerID]['bilanzwert'] = 0;
+          }
 
           // Erstelle den WP-Post
           if (!$this->rp_create_post($spieler[$spielerID])) {
@@ -217,7 +218,20 @@ class SpielerParser {
     }
 
     // Fuege den Rang dem Post als Meta-Information hinzu damit in der Kategorie-Ansicht die Spieler sortiert werden koennen
-    update_post_meta($postID, ParserUtils::konvertiereMannschaftsNamen($spieler['mannschaft']), $spieler['rang'], true);
+    update_post_meta($postID, 'rang', $spieler['rang'], true);
+
+    // Fuege dem Post die beste Bilanz aller Mannschaften hinzu
+    if (get_post_meta($postID, 'bilanzwert', true) !== '') {
+      $bilanz = get_post_meta($postID, 'bilanzwert', true);
+      if (intval($spieler['bilanzwert']) > $bilanz) {
+        update_post_meta($postID, 'bilanzwert', $spieler['bilanzwert']);
+        update_post_meta($postID, 'mannschaft', $spieler['mannschaft']);
+      }
+    } else {
+      update_post_meta($postID, 'bilanzwert', $spieler['bilanzwert']);
+      update_post_meta($postID, 'mannschaft', $spieler['mannschaft']);
+    }
+
 
     // Taxonomy immer hinzufuegen! Da auch welche hinzukommen koennen
     wp_add_object_terms($postID, $spieler['mannschaft'], 'rp_spieler_mannschaft');

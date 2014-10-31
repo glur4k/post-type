@@ -152,6 +152,10 @@ function rp_aktivierungs_hooks() {
   // int position               Die aktuelle Position in der Liga
   // text liga                  Liga, in der die Mannschaft spielt
   // int begegnungen            Anzahl der Spiele, die die Mannschaft schon hatte
+  // int siege                  Anzahl der Siege
+  // int unentschieden          Anzahl der unentschiedenen Spiele
+  // int niederlagen            Anzahl der Niederlagen
+  // text punkte                enthaelt das Punkteverhältnis X:Y
   // text data_tabelle          enthaelt die Tabelle der Mannschaft in der Spielklasse
   // text data_ergebnisse       enthaelt die Tabelle mit den bisherigen Ergebnissen der Mannschaft
   $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
@@ -163,6 +167,10 @@ function rp_aktivierungs_hooks() {
     position mediumint,
     liga text,
     begegnungen mediumint,
+    siege mediumint,
+    unentschieden mediumint,
+    niederlagen mediumint,
+    punkte text,
     data_tabelle text,
     data_ergebnisse text,
     UNIQUE KEY id (id)
@@ -395,12 +403,12 @@ function rp_spieler_custom_columns($column) {
   switch ($column) {
     case "photo":
       if (has_post_thumbnail()) {
-        echo '<a href="' . get_edit_post_link() . '">';
-        the_post_thumbnail(array(50, 50), array('style' => 'border-radius:50%;'));
+        echo '<a class="spieler-portrait-wrapper" href="' . get_edit_post_link() . '">';
+        the_post_thumbnail(array(60, 60));
         echo '</a>';
       } else {
         echo '<a href="' . get_edit_post_link() . '">';
-        echo '<div class="rp_spieler_liste_no_thumbnail">';
+        echo '<div class="spieler-portrait-wrapper portrait-wrapper-no-img">';
         echo ParserUtils::baueTitelKuerzel(get_the_title());
         echo '</div>';
         echo '</a>';

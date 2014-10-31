@@ -9,7 +9,14 @@ get_header(); ?>
     <div class="content-header-sep" style="background-image: url(<?php echo $headerSep; ?>);"></div>
       <div class="page">
         <?php
+          // Hole data_tabelle, data_ergebnisse, link, begegnungen aus mannschaften_daten Tabelle
           $mannschaft = get_query_var('term');
+
+          $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
+          $sql = "SELECT data_tabelle, data_ergebnisse, link, gegner, begegnungen, position, siege, unentschieden, niederlagen, punkte FROM $table_name
+                  WHERE name = %s";
+          $meta = $wpdb->get_row($wpdb->prepare($sql, ParserUtils::konvertiereMannschaftsNamen($mannschaft)), ARRAY_A);
+          extract($meta);
         ?>
 
         <?php if (function_exists('z_taxonomy_image_url') && z_taxonomy_image_url() !== false): ?>
@@ -18,26 +25,32 @@ get_header(); ?>
           </p>
         <?php endif ?>
 
-        <table>
-          <tr>
-            <th>Siege</th>
-            <th>Unentschieden</th>
-            <th>Niederlagen</th>
-            <th>Bilanz</th>
-          </tr>
-          <tr>
-            <td>Bla</td>
-            <td>Blubb</td>
-            <td>Blubb</td>
-            <td>Blubb</td>
-          </tr>
+        <table class="rp_spieler-mannschafts-uebersicht">
+          <thead>
+            <tr>
+              <th>Position</th>
+              <th>Siege</th>
+              <th>Unentschieden</th>
+              <th>Niederlagen</th>
+              <th>Punkte</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php echo $position . "/" . ($gegner + 1)?></td>
+              <td><?php echo $siege ?></td>
+              <td><?php echo $unentschieden ?></td>
+              <td><?php echo $niederlagen ?></td>
+              <td><?php echo $punkte ?></td>
+            </tr>
+          </tbody>
         </table>
 
         <?php
           // Erstelle das Spieler-Query
           $args = array(
             'post_type' => 'rp_spieler',
-            'meta_key'=> $mannschaft,
+            'meta_key'=> 'rang',
             'orderby' => 'meta_value_num',
             'order' => ASC,
             'posts_per_page' => -1,
@@ -51,16 +64,6 @@ get_header(); ?>
           );
           $the_query = new WP_Query($args);
         ?>
-
-        <?php
-          // Hole data_tabelle, data_ergebnisse, link, begegnungen aus mannschaften_daten Tabelle
-          $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
-          $sql = "SELECT data_tabelle, data_ergebnisse, link, begegnungen FROM $table_name
-                  WHERE name = %s";
-          $meta = $wpdb->get_row($wpdb->prepare($sql, ParserUtils::konvertiereMannschaftsNamen($mannschaft)), ARRAY_A);
-          extract($meta);
-        ?>
-
 
         <h5 class="dt-message dt-message-info">Mannschaftsaufstellung</h5>
 
@@ -79,15 +82,13 @@ get_header(); ?>
               }
             ?>
 
-
-
             <?php
               // Hole Daten des Spielers aus rp_spieler_daten
               $table_name = $wpdb->prefix . 'rp_spieler_daten';
               $sql = "SELECT einsaetze, bilanzwert FROM $table_name
                       WHERE post_id = %d";
-              $meta = $wpdb->get_row($wpdb->prepare($sql, get_the_ID()), ARRAY_A);
-              extract($meta);
+              $metaSpieler = $wpdb->get_row($wpdb->prepare($sql, get_the_ID()), ARRAY_A);
+              extract($metaSpieler);
             ?>
 
             <?php echo '<div class="dt-onethird' . ($last ? ' dt-onethirdlast' : '') . '">'; ?>
@@ -95,12 +96,12 @@ get_header(); ?>
                 <div class="dt-message dt-message-paragraph" style="text-align: center;">
 
                 <?php if (($url = wp_get_attachment_image_src(get_post_thumbnail_id(), 'post-thumbnail')) !== false): ?>
-                  <a class="spieler-portrait-wrapper" href="<?php echo get_post_permalink(); ?>"><?php the_post_thumbnail('medium'); ?></a>
+                  <a class="spieler-portrait-wrapper" href="<?php echo get_post_permalink(); ?>"><?php the_post_thumbnail(array(140, 140)); ?></a>
                 <?php else: ?>
-                  <a title="Ausf&uuml;hliche Statistiken zu <?php the_title(); ?>" class="spieler-portrait-wrapper wrapper-no-img" href="<?php echo get_post_permalink(); ?>"><?php echo ParserUtils::baueTitelKuerzel(get_the_title()); ?></a>
+                  <a title="Ausf&uuml;hliche Statistiken zu <?php the_title(); ?>" class="spieler-portrait-wrapper portrait-wrapper-no-img" href="<?php echo get_post_permalink(); ?>"><?php echo ParserUtils::baueTitelKuerzel(get_the_title()); ?></a>
                 <?php endif; ?>
 
-                <h6><?php echo get_post_meta(get_the_ID(), $mannschaft)[0] ?></h6>
+                <h6><?php echo get_post_meta(get_the_ID(), 'rang', true); ?></h6>
                 <h4><?php echo str_replace (" " , "<br>" , get_the_title()); ?></h4>
                 <table>
                   <tr>
