@@ -91,7 +91,7 @@ get_header(); ?>
               <?php endif; ?>
               <h4><?php the_title(); ?></h4>
               <p>
-                <a class="dt-more-link" href="<?php echo get_post_permalink(); ?>"><span><span><strong><?php echo ($bilanzwert = get_post_meta(get_the_ID(), 'bilanzwert')[0]) > 0 ?  '+' . $bilanzwert : $bilanzwert; ?></strong> (<?php echo get_post_meta(get_the_ID(), 'mannschaft', true) ?>)</span></span></a>
+                <a class="dt-more-link" href="<?php echo get_post_permalink(); ?>"><span><span>(<?php echo get_post_meta(get_the_ID(), 'mannschaft', true) ?>) <strong><?php echo ($bilanzwert = get_post_meta(get_the_ID(), 'bilanzwert')[0]) > 0 ?  '+' . $bilanzwert : $bilanzwert; ?></strong></span></span></a>
               </p>
 
             </div>
