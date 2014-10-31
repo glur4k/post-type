@@ -89,7 +89,7 @@ get_header(); ?>
               <?php else: ?>
                 <a title="Ausf&uuml;hliche Statistiken zu <?php the_title(); ?>" class="spieler-portrait-wrapper portrait-wrapper-no-img" href="<?php echo get_post_permalink(); ?>"><?php echo ParserUtils::baueTitelKuerzel(get_the_title()); ?></a>
               <?php endif; ?>
-              <h4><a title="Details von <?php the_title(); ?> anzeigen" href="<?php echo get_permalink(); ?>"><?php the_title(); ?></a></h4>
+              <h4><?php the_title(); ?></h4>
               <p>
                 <a class="dt-more-link" href="<?php echo get_post_permalink(); ?>"><span><span><strong><?php echo ($bilanzwert = get_post_meta(get_the_ID(), 'bilanzwert')[0]) > 0 ?  '+' . $bilanzwert : $bilanzwert; ?></strong> (<?php echo get_post_meta(get_the_ID(), 'mannschaft', true) ?>)</span></span></a>
               </p>

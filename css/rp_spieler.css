@@ -89,8 +89,13 @@
 
 /* Alle Spieler Seite */
 /* ------------------ */
+.alle-spieler .spieler-uebersicht {
+  height: 60px;
+}
 .alle-spieler .spieler-uebersicht h4 {
   display: inline-block;
+  vertical-align: top;
+  padding: 17px 0 0;
 }
 
 .alle-spieler .spieler-uebersicht p {
