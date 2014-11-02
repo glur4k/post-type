@@ -108,23 +108,35 @@
   margin-right: 5px;
 }
 
+/* Mannschafts Seite */
+/* ----------------- */
+.rp_spieler .spieler-portrait-wrapper {
+  margin: 0;
+}
+.rp_spieler .spieler-portrait-wrapper.portrait-wrapper-no-img {
+  height: 140px;
+  width: 140px;
+  line-height: 140px;
+  font-size: 16pt;
+  margin-bottom: 4px;
+}
+
 /* Single Spieler Seite */
 /* -------------------- */
-.spieler-portrait-wrapper {
+.single-rp_spieler .spieler-portrait-wrapper {
   margin: 0 auto;
   width: 300px;
   height: 300px;
   display: block;
   margin-bottom: 30px;
 }
-.spieler-portrait-wrapper img {
+.single-rp_spieler .spieler-portrait-wrapper img {
   width: 100%;
   height: 100%;
 }
 
 /* Admin Seite */
 /* ----------- */
-
 .column-rp_spieler_mannschaft {
   width: 200px;
 }

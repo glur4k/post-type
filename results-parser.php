@@ -444,7 +444,6 @@ new Featured_Image_Box_Changer(array(
 // ************ AJAX FUNKTIONALITAET ************ //
 // ********************************************** //
 add_action('wp_ajax_rp_spieler_import', 'rp_parser_process_ajax');
-
 function rp_parser_process_ajax() {
   // MANNSCHAFTSPARSER MUSS VOR DEM SPIELER PARSER LAUFEN!
   // Dieser parst allerdings nur die Mannschaftsnamen und keine weiteren Daten
@@ -461,6 +460,16 @@ function rp_parser_process_ajax() {
   }
 
   die();
+}
+
+
+// ************ CHART FUNKTIONALITAET FUER EINZELNEN SPIELER ************ //
+// ********************************************************************** //
+add_action('wp_enqueue_scripts', 'rp_enque_charts_javascript');
+function rp_enque_charts_javascript() {
+  if (!is_admin() && (is_single() && get_post_type() === 'rp_spieler')) {
+    wp_enqueue_script('charts-script', plugin_dir_url( __FILE__ ) . '/js/vendor/charts.js', array('jquery'));
+  }
 }
 
 ?>
