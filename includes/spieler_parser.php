@@ -220,6 +220,9 @@ class SpielerParser {
     // Fuege den Rang dem Post als Meta-Information hinzu damit in der Kategorie-Ansicht die Spieler sortiert werden koennen
     update_post_meta($postID, 'rang', $spieler['rang'], true);
 
+    // Fuege Click-TT-ID dem Post als Post-Meta hinzu
+    update_post_meta($postID, 'click_tt_id', $spieler['click_tt_id'], true);
+
     // Fuege dem Post die beste Bilanz aller Mannschaften hinzu
     if (get_post_meta($postID, 'bilanzwert', true) !== '') {
       $bilanz = get_post_meta($postID, 'bilanzwert', true);
