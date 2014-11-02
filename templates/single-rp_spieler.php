@@ -35,11 +35,11 @@
               $mannschaften[] = $result->mannschaft;
             }
           } else {
-            $mannschaften[] = $mannschaft;
+            $mannschaften[] = ParserUtils::konvertiereMannschaftsNamen($mannschaft);
           }
         ?>
 
-        <?php foreach ($mannschaften as $mannschaft): ?>
+        <?php foreach ($mannschaften as $key => $mannschaft): ?>
           <?php
             $table_name = $wpdb->prefix . 'rp_spieler_daten';
             $sql = "SELECT position, einsaetze, bilanzwert, link FROM $table_name
@@ -49,6 +49,7 @@
             extract($data);
           ?>
 
+          <h5 class="dt-message dt-message-info">Statistiken in der Mannschaft: <?php echo $mannschaft ?></h5>
           <table>
             <thead>
               <tr>
@@ -62,15 +63,15 @@
             <tbody>
               <tr>
                 <td><strong><?php echo $mannschaft ?></strong></td>
-                <td><?php echo $position ?></td>
-                <td><?php echo $einsaetze ?></td>
-                <td><?php echo $bilanzwert > 0 ?  '+' . $bilanzwert : $bilanzwert; ?></td>
-                <td><a href="<?php echo $link ?>" target="_blank" title="Neues Fenster: Link zu Click-TT">Link</a></td>
+                <td><strong><?php echo $position ?></strong></td>
+                <td><strong><?php echo $einsaetze ?></strong></td>
+                <td><strong><?php echo $bilanzwert > 0 ?  '+' . $bilanzwert : $bilanzwert; ?></strong></td>
+                <td><a href="<?php echo $link ?>" target="_blank" title="Neues Fenster: Link zu Click-TT-Daten von <?php echo the_title() ?> in der Mannschaft <?php echo $mannschaft ?>">Link</a></td>
               </tr>
             </tbody>
           </table>
 
-          <h5 class="dt-message dt-message-info">Statistik: Verhältnis von gewonnenen zu verlorenen Spielen</h5>
+          <h6>Statistik: Verhältnis von gewonnenen zu verlorenen Spielen</h6>
           <div class="myChart" style="min-width: 310px; max-width: 800px; height: 350px; margin: 0 auto"></div>
 
           <script type="text/javascript">
@@ -109,11 +110,11 @@
                     reversed: true
                   },
                   series: [{
-                    name: 'Verloren',
+                    name: 'Verlorene Spiele',
                     data: [3, 4, 4, 2, 5],
                     color: '#F33030'
                   }, {
-                    name: 'Gewonnen',
+                    name: 'Gewonnene Spiele',
                     data: [5, 3, 4, 7, 2],
                     color: '#1f9AE3'
                   }]
@@ -121,6 +122,9 @@
               });
             //--><!]]>
           </script>
+          <?php if (count($mannschaften) > 1 && $key + 1 < count($mannschaften)) : ?>
+            <div class="dt-separator-top"><a class="scroll" href="#website-header">TOP</a></div>
+          <?php endif; ?>
 
         <?php endforeach; ?>
 
