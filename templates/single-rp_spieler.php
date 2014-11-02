@@ -9,9 +9,9 @@
 ?>
 
 <?php get_header(); ?>
-  <section id="content" class="clearfix">
+  <section id="content" class="clearfix page-widh-sidebar">
     <div class="content-header-sep"></div>
-    <div class="page page-full">
+    <div class="page">
       <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
         <?php if (($src = wp_get_attachment_image_src(get_post_thumbnail_id(), 'post-thumbnail')[0]) !== false): ?>
           <a title="<?php the_title() ?>" href="<?php echo $src ?>" class="spieler-portrait-wrapper" rel="modal-window"><?php the_post_thumbnail(); ?></a>
@@ -48,5 +48,6 @@
       <?php endif; ?>
     </div>
   <!-- end of content -->
+  <?php get_sidebar(); ?>
   </section>
 <?php get_footer(); ?>
