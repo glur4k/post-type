@@ -28,7 +28,7 @@ get_header(); ?>
         <table class="rp_spieler-mannschafts-uebersicht">
           <thead>
             <tr>
-              <th>Position</th>
+              <th>Tabellenplatz</th>
               <th>Siege</th>
               <th>Unentschieden</th>
               <th>Niederlagen</th>

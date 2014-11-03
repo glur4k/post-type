@@ -110,5 +110,34 @@ class ParserUtils {
     }
     return $bilanzwert;
   }
+
+  public static function rpGetGewonneneSpiele($spiele) {
+    return substr($spiele, 0, 1);
+  }
+
+  public static function rpGetVerloreneSpiele($spiele) {
+    return substr($spiele, 2, 1);
+  }
+
+  public static function rp_erstelle_namen_fuer_charts_js($name) {
+    $falscheNamen = array(
+      'gesamt' => 'Gesamte Spiele',
+      'gegner1' => 'Gegen Nr. 1',
+      'gegner2' => 'Gegen Nr. 1',
+      'gegner3' => 'Gegen Nr. 1',
+      'gegner4' => 'Gegen Nr. 1',
+      '1und2' => 'Gg. erstes Paarkreuz',
+      '3und4' => 'Gg. zweites Paarkreuz',
+      '5und6' => 'Gg. drittes Paarkreuz',
+    );
+
+    if (array_key_exists($name, $falscheNamen)) {
+      $name = $falscheNamen[$name];
+    } else if (in_array($name, $falscheNamen)) {
+      $name = array_search($name, $falscheNamen);
+    }
+
+    return $name;
+  }
 }
 ?>

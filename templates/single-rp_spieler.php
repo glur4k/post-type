@@ -39,7 +39,8 @@
           }
         ?>
 
-        <?php foreach ($mannschaften as $key => $mannschaft): ?>
+        <?php $count = 0; ?>
+        <?php foreach ($mannschaften as $mannschaftsKey => $mannschaft): ?>
           <?php
             $table_name = $wpdb->prefix . 'rp_spieler_daten';
             $sql = "SELECT position, einsaetze, bilanzwert, link, gesamt, gegner1, gegner2, gegner3, gegner4, 1und2, 3und4, 5und6 FROM $table_name
@@ -61,6 +62,9 @@
           ?>
 
           <h5 class="dt-message dt-message-info">Statistiken in der Mannschaft: <?php echo $mannschaft ?></h5>
+          <?php
+            print_r($forCharts);
+          ?>
           <table>
             <thead>
               <tr>
@@ -82,60 +86,78 @@
             </tbody>
           </table>
 
-          <h6>Statistik: Verhältnis von gewonnenen zu verlorenen Spielen</h6>
-          <div class="myChart" style="min-width: 310px; max-width: 800px; height: 350px; margin: 0 auto"></div>
+          <?php if (count($forCharts) !== 0) : ?>
+            <h6>Statistik: Verhältnis von gewonnenen zu verlorenen Spielen</h6>
+            <?php
+              // Berechne Hoehe fuer die Charts
+              $height = 100 + count($forCharts) * 50;
+            ?>
+            <div id="spieler-chart-<?php echo $count ?>" style="min-width: 310px; max-width: 800px; height: <?php echo $height ?>px; margin: 0 auto"></div>
 
-          <script type="text/javascript">
-            <!--//--><![CDATA[//><!--
-              Highcharts.setOptions({
-                chart: {
-                  backgroundColor: 'rgba(0, 0, 0, 0)'
-                }
-              });
-              $(function () {
-                $('.myChart').highcharts({
+            <script type="text/javascript">
+              <!--//--><![CDATA[//><!--
+                Highcharts.setOptions({
                   chart: {
-                    type: 'bar'
-                  },
-                  credits: {
-                    enabled: false
-                  },
-                  title: {
-                    text: false
-                  },
-                  xAxis: {
-                    categories: ['Gesamte Spiele', 'Gg. Nr. 1', 'Gg. Nr. 2', 'Gg. erstes Paarkreuz', 'Gg. zweites Paarkreuz']
-                  },
-                  yAxis: {
-                    min: 0,
-                    title: {
-                      text: 'Spiele insgesamt'
-                    }
-                  },
-                  plotOptions: {
-                    series: {
-                      stacking: 'normal'
-                    }
-                  },
-                  legend: {
-                    reversed: true
-                  },
-                  series: [{
-                    name: 'Verlorene Spiele',
-                    data: [3, 4, 4, 2, 5],
-                    color: '#F33030'
-                  }, {
-                    name: 'Gewonnene Spiele',
-                    data: [5, 3, 4, 7, 2],
-                    color: '#1f9AE3'
-                  }]
+                    backgroundColor: 'rgba(0, 0, 0, 0)'
+                  }
                 });
-              });
-            //--><!]]>
-          </script>
-          <?php if (count($mannschaften) > 1 && $key + 1 < count($mannschaften)) : ?>
+                $(function () {
+                  $('#spieler-chart-<?php echo $count ?>').highcharts({
+                    chart: {
+                      type: 'bar'
+                    },
+                    credits: {
+                      enabled: false
+                    },
+                    title: {
+                      text: false
+                    },
+                    xAxis: {
+                      categories: [
+                      <?php
+                        foreach ($forCharts as $name => $eintrag) {
+                          echo "'" . ParserUtils::rp_erstelle_namen_fuer_charts_js($name) . "', ";
+                        }
+                      ?>
+                      ]
+                    },
+                    yAxis: {
+                      min: 0,
+                      tickInterval: 1,
+                      title: {
+                        text: 'Spiele insgesamt'
+                      }
+                    },
+                    plotOptions: {
+                      series: {
+                        stacking: 'normal'
+                      }
+                    },
+                    legend: {
+                      reversed: true
+                    },
+                    series: [{
+                      name: 'Verlorene Spiele',
+                      data: [<?php foreach ($forCharts as $verhltn) {
+                        echo ParserUtils::rpGetVerloreneSpiele($verhltn) . ",";
+                      } ?>],
+                      color: '#F33030'
+                    }, {
+                      name: 'Gewonnene Spiele',
+                      data: [<?php foreach ($forCharts as $verhltn) {
+                        echo ParserUtils::rpGetGewonneneSpiele($verhltn) . ",";
+                      } ?>],
+                      color: '#1f9AE3'
+                    }]
+                  });
+                });
+              //--><!]]>
+            </script>
+          <?php endif; ?>
+          <?php if (count($mannschaften) > 1 && $mannschaftsKey + 1 < count($mannschaften)) : ?>
             <div class="dt-separator-top"><a class="scroll" href="#website-header">TOP</a></div>
           <?php endif; ?>
+          <?php $count++; ?>
 
         <?php endforeach; ?>
 
