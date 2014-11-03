@@ -139,5 +139,20 @@ class ParserUtils {
 
     return $name;
   }
+
+  public static function rp_charts_anzahl_labels($gesamt) {
+    $values = explode(':', $gesamt);
+    $spiele = $values[0] + $values[1];
+
+    if ($spiele <= 10) {
+      return 1;
+    } else if ($spiele <= 20) {
+      return 2;
+    } else if ($spiele <= 50) {
+      return 5;
+    } else {
+      return 10;
+    }
+  }
 }
 ?>
