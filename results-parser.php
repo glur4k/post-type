@@ -469,6 +469,7 @@ add_action('wp_enqueue_scripts', 'rp_enque_charts_javascript');
 function rp_enque_charts_javascript() {
   if (!is_admin() && (is_single() && get_post_type() === 'rp_spieler')) {
     wp_enqueue_script('charts-script', plugin_dir_url( __FILE__ ) . '/js/vendor/charts.js', array('jquery'));
+    wp_enqueue_script('inview-script', plugin_dir_url( __FILE__ ) . '/js/vendor/inview.min.js', array('jquery'));
   }
 }
 

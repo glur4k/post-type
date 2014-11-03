@@ -62,9 +62,6 @@
           ?>
 
           <h5 class="dt-message dt-message-info">Statistiken in der Mannschaft: <?php echo $mannschaft ?></h5>
-          <?php
-            print_r($forCharts);
-          ?>
           <table>
             <thead>
               <tr>
@@ -87,7 +84,7 @@
           </table>
 
           <?php if (count($forCharts) !== 0) : ?>
-            <h6>Statistik: Verhältnis von gewonnenen zu verlorenen Spielen</h6>
+            <h6 style="text-align: center;">Verhältnis von gewonnenen zu verlorenen Spielen</h6>
             <?php
               // Berechne Hoehe fuer die Charts
               $height = 100 + count($forCharts) * 50;
@@ -101,7 +98,20 @@
                     backgroundColor: 'rgba(0, 0, 0, 0)'
                   }
                 });
-                $(function () {
+
+                <?php if ($count > 0) : ?>
+                  shown = false;
+                  $('#spieler-chart-<?php echo $count ?>').bind('inview', function(event, isInView, visiblePartY) {
+                    if (isInView && !shown) {
+                      show();
+                      shown = true;
+                    }
+                  });
+                <?php else : ?>
+                  show();
+                <?php endif; ?>
+
+                function show() {
                   $('#spieler-chart-<?php echo $count ?>').highcharts({
                     chart: {
                       type: 'bar'
@@ -123,7 +133,7 @@
                     },
                     yAxis: {
                       min: 0,
-                      tickInterval: 1,
+                      tickInterval: <?php echo ParserUtils::rp_charts_anzahl_labels($forCharts['gesamt']) ?>,
                       title: {
                         text: 'Spiele insgesamt'
                       }
@@ -150,7 +160,7 @@
                       color: '#1f9AE3'
                     }]
                   });
-                });
+                }
               //--><!]]>
             </script>
           <?php endif; ?>
