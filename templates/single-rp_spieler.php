@@ -42,10 +42,21 @@
         <?php foreach ($mannschaften as $key => $mannschaft): ?>
           <?php
             $table_name = $wpdb->prefix . 'rp_spieler_daten';
-            $sql = "SELECT position, einsaetze, bilanzwert, link FROM $table_name
+            $sql = "SELECT position, einsaetze, bilanzwert, link, gesamt, gegner1, gegner2, gegner3, gegner4, 1und2, 3und4, 5und6 FROM $table_name
                     WHERE mannschaft = %s
                     AND click_tt_id = %d";
             $data = $wpdb->get_row($wpdb->prepare($sql, $mannschaft, intval($clickTTID)), ARRAY_A);
+
+            // Erstelle das Array fuer die Charts
+            $forCharts = $data;
+            foreach ($forCharts as $key => $value) {
+              if (is_null($forCharts[$key]) || strlen($value) !== 3) {
+                unset($forCharts[$key]);
+              } elseif (substr_compare($value, ':', 1, 1) !== 0) {
+                unset($forCharts[$key]);
+              }
+            }
+
             extract($data);
           ?>
 
@@ -65,7 +76,7 @@
                 <td><strong><?php echo $mannschaft ?></strong></td>
                 <td><strong><?php echo $position ?></strong></td>
                 <td><strong><?php echo $einsaetze ?></strong></td>
-                <td><strong><?php echo $bilanzwert > 0 ?  '+' . $bilanzwert : $bilanzwert; ?></strong></td>
+                <td><strong><?php echo ParserUtils::signBilanzwert($bilanzwert) ?></strong></td>
                 <td><a href="<?php echo $link ?>" target="_blank" title="Neues Fenster: Link zu Click-TT-Daten von <?php echo the_title() ?> in der Mannschaft <?php echo $mannschaft ?>">Link</a></td>
               </tr>
             </tbody>

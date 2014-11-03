@@ -238,6 +238,8 @@ class SpielerParser {
 
     // Taxonomy immer hinzufuegen! Da auch welche hinzukommen koennen
     wp_add_object_terms($postID, $spieler['mannschaft'], 'rp_spieler_mannschaft');
+
+
     return true;
   }
 

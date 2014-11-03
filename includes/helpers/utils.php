@@ -20,26 +20,36 @@ class ParserUtils {
    */
   public static function rp_erstelle_valide_spalten_namen($spalten) {
     $invalideSpalten = array(
-      '1' => 'gegner-1',
-      '2' => 'gegner-2',
-      '3' => 'gegner-3',
-      '4' => 'gegner-4',
-      '5' => 'gegner-5',
-      '6' => 'gegner-6'
+      '1' => 'gegner1',
+      '2' => 'gegner2',
+      '3' => 'gegner3',
+      '4' => 'gegner4',
+      '5' => 'gegner5',
+      '6' => 'gegner6',
+      '1+2' => '1und2',
+      '3+4' => '3und4',
+      '5+6' => '5und6'
     );
 
     foreach ($spalten as $key => $spalte) {
       if (array_key_exists($key, $invalideSpalten)) {
-        $spalten['gegner-' . $key] = $spalte;
-        unset($spalten[$key]);
-      } else if (in_array($key, $invalideSpalten)) {
-        $newKey = array_search($key, $invalideSpalten);
-        $spalten[$newKey] = $spalte;
+        $spalten[$invalideSpalten[$key]] = $spalten[$key];
         unset($spalten[$key]);
       }
     }
 
     return $spalten;
+  }
+
+
+  function array_change_key_name( $orig, $new, &$array )
+  {
+      if ( isset( $array[$orig] ) )
+      {
+          $array[$new] = $array[$orig];
+          unset( $array[$orig] );
+      }
+      return $array;
   }
 
   /**
