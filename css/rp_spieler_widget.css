@@ -1,11 +1,15 @@
 /* Widget Anzeige */
 /* --------------------------------- */
+.rp_spieler_widget {
+  padding: 0 !important;
+}
+
 .rp_spieler_widget .spieler-portrait-wrapper {
   float: left;
   line-height: 60px;
   height: 60px;
   width: 60px;
-  margin-right: 10px;
+  margin: 0 10px 0 0;
 }
 
 .rp_spieler_widget .top-spieler.post-content {
