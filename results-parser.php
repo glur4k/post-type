@@ -370,6 +370,14 @@ function rp_lade_css_spieler_etc() {
   wp_enqueue_style('rp-spieler-stylesheet', plugins_url('css/rp_spieler.css', __FILE__));
 }
 
+/*
+ * Lade das CSS fuer das Widget, muss immer geladen werden
+ */
+add_action('wp_enqueue_scripts', 'rp_lade_css_spieler_widget');
+function rp_lade_css_spieler_widget() {
+  wp_enqueue_style('results-parser-top-spieler-style', plugins_url('css/rp_spieler_widget.css', __FILE__), false);
+}
+
 
 // ************ MODIFIZIERE ADMIN SEITE ************ //
 // ************************************************* //
@@ -471,6 +479,40 @@ function rp_enque_charts_javascript() {
     wp_enqueue_script('charts-script', plugin_dir_url( __FILE__ ) . '/js/vendor/charts.js', array('jquery'));
     wp_enqueue_script('inview-script', plugin_dir_url( __FILE__ ) . '/js/vendor/inview.min.js', array('jquery'));
   }
+}
+
+
+// ************ LOESCH-HOOK EINES POSTS ************ //
+// ************************************************* //
+// Loesche Spieler aus der rp_spieler_daten Datenbank, wenn der Post geloescht wird
+add_action('before_delete_post', 'rp_codex_remove_sync', 10);
+function rp_codex_remove_sync($pid) {
+  if(did_action('trash_post')){
+    return;
+  }
+
+  $post = get_post($pid);
+  if ($post->post_type != 'rp_spieler') {
+    return;
+  }
+
+  wp_delete_object_term_relationships($pid, 'rp_spieler_mannschaft');
+
+  global $wpdb;
+  $wpdb->show_errors();
+  $table_name = $wpdb->prefix . 'rp_spieler_daten';
+  $wpdb->get_row('query', OBJECT);
+  if ($wpdb->prepare('SELECT * FROM $table_name WHERE post_id = %d', $pid)) {
+    delete_post_meta($pid, 'click_tt_id');
+    delete_post_meta($pid, 'rang');
+    delete_post_meta($pid, 'mannschaft');
+    delete_post_meta($pid, 'bilanzwert');
+    $wpdb->delete($table_name, array('post_id' => $pid));
+  }
+  $wpdb->show_errors();
+
+
+  return true;
 }
 
 ?>

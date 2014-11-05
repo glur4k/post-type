@@ -1,0 +1,43 @@
+/* Widget Anzeige */
+/* --------------------------------- */
+.rp_spieler_widget .spieler-portrait-wrapper {
+  float: left;
+  line-height: 60px;
+  height: 60px;
+  width: 60px;
+  margin-right: 10px;
+}
+
+.rp_spieler_widget .top-spieler.post-content {
+  padding: 0 !important;
+}
+
+.rp_spieler_widget .top-spieler .rp-spieler-content {
+  padding-top: 9px;
+  float: left;
+}
+
+.rp_spieler_widget .top-spieler.post-content .more-link {
+  padding-left: 65px !important;
+}
+
+.rp_spieler_widget .top-spieler  a {
+  clear: both;
+}
+
+.rp_spieler_widget hr {
+  margin: 15px auto;
+}
+
+.rp_spieler_widget hr:last-of-type {
+  margin: 15px auto 5px;
+}
+
+.rp_spieler_widget h6 {
+  padding: 0 0 5px !important;
+}
+
+.rp_spieler_widget h4 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
