@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Post Type
-Description: Plugin um den Post Type zu testen
-Version: 1.0
+Plugin Name: Results Parser
+Description: Parst Spieler und Mannschaften eines Vereins von Click-TT
+Version: 1.9
 Author: Sandro Tonon
 License: GPLv2
 */
@@ -49,7 +49,7 @@ function rp_registriere_post_type_spieler() {
     'show_in_menu' => true,
     'capability_type' => 'post',
     'capabilities' => array(
-      'create_posts' => false, // Removes support for the "Add New" function
+      'create_posts' => false, // Entferne "Neuer Spieler" Support
     ),
     'map_meta_cap' => true,
     'hierarchical' => false,
@@ -373,6 +373,7 @@ function rp_lade_css_spieler_etc() {
 /*
  * Lade das CSS fuer das Widget, muss immer geladen werden
  */
+add_action('admin_enqueue_scripts', 'rp_lade_css_spieler_widget');
 add_action('wp_enqueue_scripts', 'rp_lade_css_spieler_widget');
 function rp_lade_css_spieler_widget() {
   wp_enqueue_style('results-parser-top-spieler-style', plugins_url('css/rp_spieler_widget.css', __FILE__), false);
@@ -453,20 +454,11 @@ new Featured_Image_Box_Changer(array(
 // ********************************************** //
 add_action('wp_ajax_rp_spieler_import', 'rp_parser_process_ajax');
 function rp_parser_process_ajax() {
-  // MANNSCHAFTSPARSER MUSS VOR DEM SPIELER PARSER LAUFEN!
-  // Dieser parst allerdings nur die Mannschaftsnamen und keine weiteren Daten
   try {
-    $mannschaftsParser = new MannschaftsParser();
+    $spieler_parser = new CronSpieler();
   } catch (Exception $e) {
     echo 'Fehler! ' . $e->getMessage();
   }
-
-  try {
-    $spieler_parser = new SpielerParser();
-  } catch (Exception $e) {
-    echo 'Fehler! ' . $e->getMessage();
-  }
-
   die();
 }
 
@@ -514,5 +506,4 @@ function rp_codex_remove_sync($pid) {
 
   return true;
 }
-
 ?>

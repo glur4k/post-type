@@ -27,10 +27,9 @@ get_header(); ?>
           // Hole Position der Mannschaft aus der Datenbank
           $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
           $positionsDaten = $wpdb->get_results(
-            "
-              SELECT name, position
-              FROM $table_name
-            ", ARRAY_A
+            "SELECT name, position
+             FROM $table_name",
+             ARRAY_A
           );
         ?>
 

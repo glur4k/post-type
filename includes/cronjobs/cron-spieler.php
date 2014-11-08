@@ -1,14 +1,15 @@
 <?php
-header("charset=utf-8");
-require_once('helpers/utils.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/virtual/wordpress-test/wp-load.php');
 
 /**
 * Parst die Spieler auf Click-TT...
 */
-class SpielerParser {
+class CronSpieler {
 
   private $vereinsID;
   private $nummer_spieler = 1;
+  private $mannschaften = array();
+  private $spieler = array();
 
   /**
    * Parst die Spieler als Post in die Wordpress Datenbank mit der click-tt-id zur Einfachheit.
@@ -18,6 +19,8 @@ class SpielerParser {
   function __construct() {
     $this->settings = get_option('rp_results_parser_einstellungen');
     $this->vereinsID = $this->settings['rp_vereins_id'];
+    $this->rp_parse_mannschaften_dummy();
+    $cronMannschaften = new CronMannschaften();
     $output = $this->rp_parse_spieler($this->rp_hole_mannschaftsmeldungen_links());
 
     if (!$output) {
@@ -25,6 +28,10 @@ class SpielerParser {
     } else {
       echo "<div class='updated'><p>Alle Spieler erfolgreich importiert!</p></div>";
     }
+
+    $this->rp_clean_spieler_posts();
+
+    unset($cronMannschaften);
   }
 
   /**
@@ -136,6 +143,9 @@ class SpielerParser {
           if (!$this->rp_create_post($spieler[$spielerID])) {
             echo "Fehler beim Erstellen des Spieler-Posts!";
           }
+
+          // Fuege den Spieler in Array hinzu um spaeter den Vergleich von allen Spielern zu machen
+          $this->spieler[] = $spieler[$spielerID]['vorname'] . " " . $spieler[$spielerID]['nachname'];
         }
         unset($spieler);
       }
@@ -166,7 +176,7 @@ class SpielerParser {
 
     if (!is_null($postID)) {
       // Post nur updaten
-      echo "Spieler existiert schon. " . $spieler['vorname'] . ' ' . $spieler['nachname'] . ' wurde aktualisiert ' . $spieler['nachname'] . ' (' . $spieler['mannschaft'] . ")<br>";
+      // echo "Spieler existiert schon. " . $spieler['vorname'] . ' ' . $spieler['nachname'] . ' wurde aktualisiert ' . $spieler['nachname'] . ' (' . $spieler['mannschaft'] . ")<br>";
     } else {
       // Post existiert noch nicht -> Post erstellen
       $post = array(
@@ -243,6 +253,79 @@ class SpielerParser {
     return true;
   }
 
+  /*
+   * Parst die Mannschaftsnamen beim Import der Spieler
+   */
+  private function rp_parse_mannschaften_dummy() {
+    $startseite = "http://ttvbw.click-tt.de/cgi-bin/WebObjects/nuLigaTTDE.woa/wa/clubTeams?club=" . $this->vereinsID;
+
+    $mannschaftsNamen = array();
+
+    $html = file_get_html($startseite);
+    $html = $html->find('table', 0);
+
+    $isKlasse = true;
+    $zeile = 0;
+
+    // Baut die Namen der Mannschaften und die Links der Tabellen-Uebersicht
+    foreach ($html->find('tr') as $row) {
+      if ($zeile === 2) {
+        break;
+      }
+      if (strpos($row->innertext, 'Spielklassen') !== false) {
+        $isKlasse = true;
+        $zeile = 0;
+      } else if (strpos($row->innertext, 'Pokal') !== false) {
+        $isKlasse = false;
+      } else {
+        if ($isKlasse && $zeile === 0) {
+          $zeile++;
+          continue;
+        } else if ($isKlasse && $zeile >= 0) {
+          if (strpos($row->find('td', 1)->innertext, 'Relegation') !== false) {
+            continue;
+          }
+          $name = $row->find('td', 0)->innertext;
+          $link = 'http://ttvbw.click-tt.de' . $row->find('a', 0)->href;
+          $mannschaftsNamen[] = array(
+            "name" => $name,
+            "link" => '',
+            "gegner" => 0,
+            "position" => 0,
+            "liga" => '',
+            "data_tabelle" => '',
+            "data_ergebnisse" => ''
+          );
+        }
+      }
+      $row->clear();
+      unset($row);
+    }
+    $html->clear();
+    unset($html);
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rp_mannschaften_daten';
+
+    foreach ($mannschaftsNamen as $mannschaft) {
+      $exists = $wpdb->get_row($wpdb->prepare(
+        "SELECT *
+        FROM $table_name
+        WHERE name = %s",
+        $mannschaft['name']
+      ), ARRAY_A);
+
+      if ($exists == 0) {
+        $wpdb->insert($table_name, $mannschaft);
+        $name = ParserUtils::konvertiereMannschaftsNamen($mannschaft['name']);
+        wp_insert_term($mannschaft['name'], 'rp_spieler_mannschaft', array('slug' => $name));
+        // echo "Mannschaft eingef&uuml;gt: " . $mannschaft['name'] . "<br>";
+      }
+    }
+
+    return true;
+  }
+
   /**
    * Versuch moeglichst viel Speicher wieder freizugeben, wenn das Element nicht mehr gebraucht wird
    * @param  array $elemente Array mit den Elementen die geloescht werden koennen
@@ -273,6 +356,39 @@ class SpielerParser {
     list($nachname, $vorname) = explode(',', $link->plaintext);
     return array($output["person"], trim($vorname), trim($nachname));
   }
-}
 
+  /**
+   * Loescht veraltete Spieler aus der posts Datenbank
+   * Ebenso die Post-Metadaten und die Relationen des Posts
+   */
+  private function rp_clean_spieler_posts() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'posts';
+
+    $vorhandeneSpieler = $wpdb->get_results(
+      "SELECT post_title, ID
+      FROM $table_name
+      WHERE post_type = 'rp_spieler'
+      ", ARRAY_A
+    );
+
+    $neueSpieler = $this->spieler;
+
+    // Wenn vorhandeneSpieler nicht in neueSpieler ist => loesche vorhandeneSpieler[ID]
+    foreach ($vorhandeneSpieler as $spieler) {
+      if (!in_array($spieler['post_title'], $neueSpieler)) {
+        // Loesche Post-Meta
+        delete_post_meta($spieler['ID'], 'bilanzwert');
+        delete_post_meta($spieler['ID'], 'click_tt_id');
+        delete_post_meta($spieler['ID'], 'mannschaft');
+        delete_post_meta($spieler['ID'], 'rang');
+        // Loesche Post-Relationen
+        wp_delete_object_term_relationships($spieler['ID'], 'rp_spieler_mannschaft');
+        // Loesche Post
+        $wpdb->delete($table_name, array('ID' => $spieler['ID']));
+        echo "Alten Spieler gelöscht: " . $spieler['post_title'] . "<br>";
+      }
+    }
+  }
+}
 ?>

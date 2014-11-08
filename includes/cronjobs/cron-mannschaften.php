@@ -1,10 +1,5 @@
 <?php
-header('Content-Type: text/html; charset=utf-8');
-define('SHORTINIT', true);
-require_once('/../vendor/simple_html_dom.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/virtual/wordpress-test/wp-load.php');
-
-define(ABS_PATH, dirname($_SERVER['SCRIPT_NAME']));
+define('ABS_PATH', dirname($_SERVER['SCRIPT_NAME']));
 
 /*
  * Startseite: Die Click-TT Seite auf der alle Mannschaften gelistet sind
@@ -15,6 +10,7 @@ class CronMannschaften {
   private $startseite;
   private $tableStartseite;
   private $clubName;
+  private $neueMannschaften = array();
 
   function __construct() {
     $this->vereinsID = get_option('rp_results_parser_einstellungen')['rp_vereins_id'];
@@ -24,6 +20,7 @@ class CronMannschaften {
     $this->tableStartseite = $html->find('table', 0);
 
     $this->rp_refresh_mannschaften();
+    $this->rp_clean_alte_mannschaften();
   }
 
   private function rp_refresh_mannschaften() {
@@ -43,6 +40,7 @@ class CronMannschaften {
       $mannschaften[$key] = array_replace($mannschaften[$key], $this->rp_get_mannschaften_SUNPunkte($mannschaftsLink));
       $mannschaften[$key]['data_tabelle'] = $this->rp_get_mannschaften_data_tabelle($mannschaftsLink);
       $mannschaften[$key]['data_ergebnisse'] = $this->rp_get_mannschaften_data_ergebnisse($mannschaft['name'], $mannschaftsLink);
+      $this->neueMannschaften[] = $mannschaft['name'];
     }
 
     $this->rp_schreibe_mannschaften_in_datenbank($mannschaften);
@@ -317,6 +315,29 @@ class CronMannschaften {
     $wpdb->print_error();
   }
 
+  /**
+   * Loescht die alten Taxonomy Terms aus der terms Tabelle
+   */
+  private function rp_clean_alte_mannschaften() {
+    // Hole vorhandene Terms
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'terms';
+
+    $vorhandeneMannschaften = $wpdb->get_results(
+      "SELECT name, term_id
+      FROM $table_name
+      ", ARRAY_A
+    );
+
+    // Wenn vorhandeneMannschaft nicht in vorhandeneMannschaften ist => loesche vorhandeneMannschaft[term_id]
+    foreach ($vorhandeneMannschaften as $mannschaft) {
+      if (!in_array($mannschaft['name'], $this->neueMannschaften)) {
+        $wpdb->delete($table_name, array('term_id' => $mannschaft['term_id']));
+        echo "Alte Mannschaft gelöscht: " . $mannschaft['name'] . "<br>";
+      }
+    }
+  }
+
   private function rp_cleanup() {
     unset($this->html);
 
@@ -324,7 +345,4 @@ class CronMannschaften {
     unset($this->tableStartseite);
   }
 }
-
-$cron = new CronMannschaften();
-unset($cron);
 ?>

@@ -5,18 +5,18 @@
  */
 add_action('widgets_init', 'rp_register_spieler_widget');
 function rp_register_spieler_widget() {
-  register_widget('ResultsParserWidget');
+  register_widget('WidgetBesteSpieler');
 }
 
 /**
  * Klasse fuer das Top-X Spieler Widget
  */
-class ResultsParserWidget extends WP_Widget {
+class WidgetBesteSpieler extends WP_Widget {
 
   // constructor
-  function ResultsParserWidget() {
+  function WidgetBesteSpieler() {
     parent::WP_Widget(
-      'rp_widget',
+      'rp_widget_spieler',
       $name = __('Beste Spieler', 'wp_widget_plugin'),
       array('description' => __('Dieses Widget zeigt die besten Spieler des Plugins', 'text_domain'))
     );

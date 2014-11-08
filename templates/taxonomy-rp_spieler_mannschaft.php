@@ -132,7 +132,7 @@ get_header(); ?>
 
           <?php wp_reset_postdata(); ?>
         <?php else : ?>
-          <p><?php _e('Sorry, no posts matched your criteria.'); ?></p>
+          <p><?php _e('Leider keine spieler in dieser Mannschaft gefunden.'); ?></p>
         <?php endif; ?>
 
         <div class="dt-message dt-message-notice" style="text-align: center;"><span style="font-size: xx-small;">

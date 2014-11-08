@@ -42,14 +42,12 @@ class ParserUtils {
   }
 
 
-  function array_change_key_name( $orig, $new, &$array )
-  {
-      if ( isset( $array[$orig] ) )
-      {
-          $array[$new] = $array[$orig];
-          unset( $array[$orig] );
-      }
-      return $array;
+  function array_change_key_name($orig, $new, &$array) {
+    if (isset($array[$orig])) {
+        $array[$new] = $array[$orig];
+        unset($array[$orig]);
+    }
+    return $array;
   }
 
   /**

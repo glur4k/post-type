@@ -45,3 +45,28 @@
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
+
+
+/* Spieler Bild immer rund und wenn kein Bild vorhanden, zeige Dummy */
+/* ----------------------------------------------------------------- */
+.spieler-portrait-wrapper {
+  display: inline-block;
+}
+.spieler-portrait-wrapper img {
+  border-radius: 50%;
+  display: block;
+}
+.spieler-portrait-wrapper.portrait-wrapper-no-img {
+  color: white !important;
+  background-color: #CCCCCC;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 12pt;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+}
+.spieler-portrait-wrapper.portrait-wrapper-no-img:hover,
+.spieler-portrait-wrapper.portrait-wrapper-no-img:hover {
+  text-decoration: none !important;
+}
