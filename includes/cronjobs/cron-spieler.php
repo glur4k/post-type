@@ -176,7 +176,7 @@ class CronSpieler {
 
     if (!is_null($postID)) {
       // Post nur updaten
-      // echo "Spieler existiert schon. " . $spieler['vorname'] . ' ' . $spieler['nachname'] . ' wurde aktualisiert ' . $spieler['nachname'] . ' (' . $spieler['mannschaft'] . ")<br>";
+      echo "Spieler existiert schon. " . $spieler['vorname'] . ' ' . $spieler['nachname'] . ' wurde aktualisiert ' . $spieler['nachname'] . ' (' . $spieler['mannschaft'] . ")<br>";
     } else {
       // Post existiert noch nicht -> Post erstellen
       $post = array(
@@ -238,12 +238,31 @@ class CronSpieler {
       $bilanz = get_post_meta($postID, 'bilanzwert', true);
       if (intval($spieler['bilanzwert']) > $bilanz) {
         update_post_meta($postID, 'bilanzwert', $spieler['bilanzwert']);
-        update_post_meta($postID, 'mannschaft', $spieler['mannschaft']);
+        update_post_meta($postID, 'bilanzInMannschaft', $spieler['mannschaft']);
       }
     } else {
       update_post_meta($postID, 'bilanzwert', $spieler['bilanzwert']);
-      update_post_meta($postID, 'mannschaft', $spieler['mannschaft']);
+      update_post_meta($postID, 'bilanzInMannschaft', $spieler['mannschaft']);
     }
+
+    // Erstelle den String fuer den Post-Meta "mannschaften" und fuege diesen hinzu
+    $inMannschaften = $wpdb->get_results($wpdb->prepare(
+      "SELECT mannschaft
+      FROM $table_name
+      WHERE click_tt_id = %d",
+      $spieler['click_tt_id']
+    ), ARRAY_N);
+
+    if (count($inMannschaften) <= 1) {
+      $string = $spieler['vorname'] . ' ' . $spieler['nachname'] . ' spielt in der Mannschaft: ' . $inMannschaften[0][0];
+    } else {
+      $string = $spieler['vorname'] . ' ' . $spieler['nachname'] . ' spielt in den Mannschaften: ';
+      foreach ($inMannschaften as $count => $mannschaft) {
+        $string .= $mannschaft[0];
+        $string .= ($count <= count($inMannschaften) - 2) ? ', ' : '';
+      }
+    }
+    update_post_meta($postID, 'mannschaften', $string);
 
 
     // Taxonomy immer hinzufuegen! Da auch welche hinzukommen koennen

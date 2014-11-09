@@ -132,3 +132,20 @@
 td.page-title {
   vertical-align: middle;
 }
+
+/* Suchergebnisse */
+/* -------------- */
+.search .spieler-portrait-wrapper {
+  width: 100px;
+  height: 100px;
+  float: left;
+  margin-right: 20px;
+}
+
+.search .spieler-content {
+  padding-top: 7px
+}
+
+.search .spieler-content a {
+  float: none !important;
+}
